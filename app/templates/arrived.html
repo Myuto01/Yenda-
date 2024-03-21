@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<html>
+<head>
+    <title>{% block title %}Yenda| Get The Best Deals On Intercity Bus Travelling{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+    <style>
+   .arrived-container {
+  text-align: center;
+  padding: 50px; /* Adjust padding as needed */
+}
+
+.arrived-p {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.home-a {
+  display: flex;
+  align-items: center;
+  margin: auto; /* Automatically center horizontally */
+}
+
+.videoa {
+  width: 290px; /* Adjust width as needed */
+  margin-left: 50px; /* Adjust margin as needed */
+}
+
+@media (max-width: 780px) {
+  .arrived-p {
+    font-size: 24px; /* Adjust font size for smaller screens */
+  }
+
+  .home-a {
+    margin: auto 165px; /* Adjust margin for smaller screens */
+  }
+
+  .videoa {
+    width: 250px; /* Adjust width for smaller screens */
+  }
+}
+
+/* Modal Styles */
+
+.modal {
+  display: none; /* Initially hide the modal */
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+}
+
+.close-button {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Additional Suggestion Form Styles */
+
+#suggestion-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Add spacing between elements */
+}
+
+#suggestion-form textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  resize: vertical; /* Allow users to resize the textarea */
+}
+
+#suggestion-form button {
+  background-color: var(--primary-color); /* Primary blue color */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#suggestion-form button:hover {
+  background-color: var(--secondary-color); /* Darker blue on hover */
+}
+
+    </style>
+</head>
+<body>
+
+    <div class="arrived-container">
+        <p class="arrived-p">
+          We are happy to hear that you arrived safely!
+        </p>
+      
+        <video autoplay muted loop class="videoa">
+          <source src="{% static 'images/Bus Animation.mp4' %}" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      
+        <br>
+      
+        <a class="home-a" href="{% url 'app:dashboard' %}">
+          Home
+        </a>
+      </div>
+      
+      <div id="suggestion-modal" class="modal">
+        <div class="modal-content">
+          <span class="close-button">&times;</span>
+          <h2>Help Us Improve Your Yenda Experience</h2>
+          <form id="suggestion-form">
+            <textarea name="suggestion" placeholder="Enter your suggestion here..." id="description"></textarea>
+            <button type="submit">Submit</button>
+          </form>
+        </div>
+      </div>
+      
+    <script>
+        // Wait 3 seconds before displaying the modal
+        setTimeout(function() {
+        document.getElementById("suggestion-modal").style.display = "block";
+        }, 3000);
+
+        // Close modal when clicking the close button
+        var closeBtn = document.getElementsByClassName("close-button")[0];
+        closeBtn.addEventListener("click", function() {
+        document.getElementById("suggestion-modal").style.display = "none";
+        });
+
+    </script>
+
+    </body>
+    
+</html>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Yenda| Inbox{% endblock %}</title>
+    <style>
+
+        .a {
+            display: block;
+            color: black;
+            font-size: 20px;
+            position: relative;
+            top: 10px;
+            border-radius: 10px;
+            text-decoration: none;
+            background: rgb(223, 220, 220);
+            height: 60px;
+            position: relative;
+            width: 359px;
+            right: 31px;
+        }
+
+        .a:hover {
+            color: var(--secondary-color);
+        }
+
+        .recipient-name {
+            position: relative;
+            top: 10px;
+        }
+
+        
+    </style>
+</head>
+<h4 style="text-align: center;">Inbox</h4>
+
+<ul>
+    {% for sender in senders %}
+      <li>
+        <a class="a" href="{% url 'app:conversation' sender.id %}" onclick="markMessagesAsRead('{{ sender.id }}')"><span class="recipient-name">{{ sender.username }}</span></a>
+    </li>
+    {% endfor %}
+</ul>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    function markMessagesAsRead(senderId) {
+        $.ajax({
+            url: "{% url 'app:mark_messages_as_read' %}",
+            type: "POST",
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                sender_id: senderId
+            },
+            success: function(response) {
+                // Check if the request was successful
+                if (response.success) {
+                    // Hide the message notification indicators
+                    $('#profile-notification, #messages-notification').hide();
+                    // Remove the class from the icon
+                    $('.dropbtn i').removeClass('notification-icon-visible');
+                } else {
+                    console.error("Error: Unable to mark messages as read.");
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("Error marking messages as read:", error);
+            }
+        });
+    }
+</script>
+{% endblock %}
+

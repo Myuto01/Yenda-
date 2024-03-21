@@ -1,0 +1,22 @@
+<!-- detail_entry.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yenda| Bus Entry</title>
+</head>
+<body>
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+    <h1>Enter Details</h1>
+    <form method="post" action="{% url 'reservation_system:detail-entry' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

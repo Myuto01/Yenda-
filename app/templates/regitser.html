@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yenda| Get The Best Deals On Intercity Bus Travelling</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+    <style>
+        .left {
+            background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5)),
+                url('{% static "images/bg1.jpg" %}');
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="split-screen">
+        <div class="left"> 
+            <section class="copy">
+                <h1 class="dynamic-txts">
+                    <ul>
+                        <li><span>Welcome to Yenda</span></li>
+                        <li><span>Tuleishani ku Yenda</span></li>
+                        <li><span>Kulibonesha ku Yenda</span></li>
+                        <li><span>Buloka ku Yenda</span></li>
+                    </ul>
+                </h1>
+                <p>Book Your Ticket Next </p>
+            </section>
+        </div>
+       <div class="right">
+        <form method="post" action="{% url 'app:register-user' %}">
+            {% csrf_token %}
+            {{form.errors}}
+            <section class="copy">
+                <h2>Sign Up</h2>
+                <div class="login-container">
+                    <p>Sign up as <a href="{% url 'reservation_system:register-bus' %}"><strong>Bus Operator</strong></a></p>
+                    <p>Already have an account? <a href="{% url 'app:login' %}"><strong>Log In</strong></a></p>
+                </div>
+            </section>
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+            <div class="input-container name">
+                <label for="id_first_name">First Name</label>
+                <input id="id_first_name" name="first_name" type="text">
+            </div>
+            <div class="input-container name">
+                <label for="id_last_name">Last Name</label>
+                <input id="id_last_name" name="last_name" type="text">
+            </div>
+            <div class="input-container username">
+                <label for="id_username">Username</label>
+                <input id="id_username" name="username" type="text">
+            </div>
+            <div class="input-container email">
+                <label for="id_email">E-mail</label>
+                <input id="id_email" name="email" type="email">
+            </div>
+            <div class="input-container password">
+                <label for="id_password1">Enter Password</label>
+                <input id="id_password1" name="password1" type="password">
+            </div>
+            <div class="input-container password">
+                <label for="id_password2">Confirm Password</label>
+                <input id="id_password2" name="password2" type="password">
+                <i class="far fa-eye-slash"></i>
+            </div>
+            <div class="input-container cta">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                    Sign up for email updates.
+                </label>
+            </div>
+            <button class="signup-btn" type="submit">Sign Up</button>
+            <section class="copy legal">
+                <p><span class="small">By continuing, you agree to accept our <br> <a href="#">Privacy Policy</a> &amp; <a href="#">Terms of service</a></span></p>
+            </section>
+        </form>
+        </div>
+    </div>
+</body>
+</html>

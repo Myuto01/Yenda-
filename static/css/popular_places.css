@@ -1,0 +1,33 @@
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.container {
+    float:center;
+}
+
+.column {
+    float: left;
+    width: 50%;
+    border-radius: 20px;
+}
+
+.element {
+    display: flex;
+    flex-direction: row;
+    border-radius: 20px;
+    border: 1px solid black;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    gap: 10px;
+}
+
+.element img {
+    display: block;
+    margin: 0 auto; /* This centers the image horizontally within the .element div */
+    width: 100%; /* Make the image fill the entire width of the container */
+    height: 100%; /* Make the image fill the entire height of the container */
+    object-fit: cover; /* Scale the image while maintaining its aspect ratio */
+}
+

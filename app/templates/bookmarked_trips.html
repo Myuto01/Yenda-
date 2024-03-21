@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load tz %}  {# Load the timezone template tags #}
+{% get_current_timezone as TIME_ZONE %}  {# Get the current timezone #}
+{% now "Y-m-d" as current_date %}  {# Get the current date in the format "YYYY-MM-DD" #}
+
+{% block content %}
+<html>
+<title>{% block title %}Yenda| Search-Result{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+<style>
+    .header-container {
+        background: rgb(219, 218, 218);
+        text-align: center;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+
+    .header-container .date {
+        font-weight: bold;
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .header-container .result-container {
+        font-size: 15px;
+    }
+
+    .header-container .result-container .result-text {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .header-container .result-container .result-text .fa {
+            font-weight: lighter;
+    }
+
+    .header-title {
+        text-align: center;
+    }
+
+    .card {
+        display: flex;
+        align-items: center;
+        width: 660px;
+        margin: 20px auto;
+        padding: 20px;
+        margin: auto auto;
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        margin-bottom: 30px;
+        border: 1px dashed #999;
+        height: 220px;
+    }
+
+    
+    .time-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: Arial, sans-serif;
+    }
+
+    .time-difference {
+        text-align: center;
+        margin-top: 8px;
+        color: black;
+    }
+
+    .line {
+        flex-grow: 1;
+        height: 1px;
+        width: 200px;
+        background-color: #000;
+    }
+
+    .dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background-color: #000; /* Black color for the dot */
+        border-radius: 50%;
+        margin: 0 10px;
+    }
+
+    .departure_time {
+        color: black;
+        font-weight: Bold;
+        margin-right: 10px;
+    }
+
+    .arrival_time {
+        margin-left: 10px;
+        color: black;
+        font-weight: 300;
+    }
+
+    .operator_container {
+        display: flex;
+        flex-direction: row;
+        gap: 340px;
+    }
+
+    .operator {
+        border: 1px solid black;
+        border-radius: 20px;
+        background: var(--primary-color);
+        color: #1848a0;
+        font-weight: bold;
+        padding: 0px 20px 0px 20px;
+        width: max-content;
+        position: relative;
+        top: 13px;
+    }
+
+    .price-container {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        position: relative;
+        left: 240px;
+        bottom: 25px;
+    }
+
+    .price {
+        color: black;
+        font-weight: bold;
+        
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    .fas.fa-bookmark {
+        color: #888; /* Default color for non-bookmarked state */
+    }
+
+    /* Style for the bookmarked state */
+    .fas.fa-bookmark.bookmarked {
+        color: var(--primary-color); /* Customize the color for the bookmarked state */
+    }
+
+    li {
+        list-style: none;
+    }
+
+    .origin-destination {
+        display: flex;
+        flex-direction: row;
+        gap: 88px;
+    }
+    
+    .origin-destination {
+        display: flex;
+        flex-direction: row;
+        gap: 222px;
+        margin-bottom: 20px;
+    }
+    
+    a { 
+        text-decoration: none;
+    }
+
+    .hover-highlight:hover {
+        border: 2px dashed var(--primary-color);
+    }
+
+    .empty-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center horizontally */
+        justify-content: center; /* Center vertically */
+        height: 100%; 
+    }
+
+    .empty-message p {
+        margin-top: 10px; 
+    }
+
+
+
+    @media (max-width: 780px) {
+        .card {
+            display: flex;
+            width: 346px;
+            margin: 20px auto;
+            right: 24px;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 3px dashed #999;
+            height: 185px;
+
+        }
+
+        .origin-destination {
+            display: flex;
+            flex-direction: row;
+            gap: 88px;
+        }
+
+        .line {
+            flex-grow: 1;
+            height: 1px;
+            width: 50px;
+            background-color: #000;
+        }
+
+        .operator_container {
+            display: flex;
+            flex-direction: row;
+            gap: 107px;
+        }
+
+        .operator {
+            width: max-content;
+            top: 0px;
+            right: 7px;
+            position: relative;
+        }
+
+        .price-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            left: 110px;
+            bottom: 40px;
+            position: relative;
+        }
+
+        a {
+            text-decoration: none;
+        }
+
+        .empty-message img {
+            vertical-align: middle;
+            width: 29%;
+            position: relative;
+            right: 20px;
+        }
+
+        .empty-message p {
+            margin-top: 10px;
+            position: relative;
+            right: 10px;
+        }
+    }
+</style>
+<body>
+    <ul>
+        {% if bookmarked_trips %}
+            {% for trip in bookmarked_trips %}
+                {% if trip.departure_date >= current_date %}
+                    <li>
+                        <a href="{% url 'app:select_tickets' trip.id %}">
+                            <div class="card hover-highlight"> <!-- Added hover-highlight class to the card -->
+                                <div class="time-container">
+                                    <strong class="time departure"><strong class="departure_time">{{ trip.departure_time }}</strong></strong>
+                                    <div class="line"></div>
+                                    <div class="dot"></div>
+                                    <div class="line"></div>&nbsp;
+                                    <strong class="time arrival"><strong class="arrival_time">{{ trip.estimated_arrival_time }}</strong></strong>
+                                </div>
+                                <p class="time-difference">
+                                    <span class="time-difference-span"></span>
+                                </p>  
+                                <div class="origin-destination"> 
+                                    {{ trip.origin }}  
+                                    <i class="fas fa-arrow-right"></i>  
+                                    {{ trip.destination }} 
+                                </div>
+                                <p class="operator">{{ trip.bus_operator.username }}</p>
+                                <div class="price-container">
+                                    <p class="price"><strong>K</strong> {{ trip.price }} </p>
+                                    <a href="#" class="bookmark-trigger" data-trip-id="{{ trip.id }}">
+                                        <i class="fas fa-bookmark {% if trip.bookmarked %}bookmarked{% endif %}"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            {% if not any_valid_trips %}
+                <!-- Display message or icon when there are no valid bookmarked trips -->
+                <li>
+                    <div class="empty-message">
+                        <!-- Add your icon or image here -->
+                        <img src="{% static 'images/icons/no-bookmarks.png' %}" alt="Empty bookmarked trips icon">
+                        <p>You have no upcoming bookmarked trips</p>
+                    </div>
+                </li>
+            {% endif %}
+        {% else %}
+            <!-- Display message or icon when bookmarked_trips is empty -->
+            <li>
+                <div class="empty-message">
+                    <!-- Add your icon or image here -->
+                    <img src="{% static 'images/icons/no-bookmarks.png' %}" alt="Empty bookmarked trips icon">
+                    <p>You have no bookmarked trips</p>
+                </div>
+            </li>
+        {% endif %}
+    </ul>
+    
+</body>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Inside the forEach loop
+// Retrieve or define cardContainers before this point
+var cardContainers = document.querySelectorAll(".card");
+
+// Ensure cardContainers is defined and not empty
+if (cardContainers && cardContainers.length > 0) {
+    // Inside the forEach loop
+    cardContainers.forEach(function (cardContainer) {
+        var departureElement = cardContainer.querySelector(".time.departure");
+        var arrivalElement = cardContainer.querySelector(".time.arrival");
+
+        var departureTimeText = departureElement.textContent.trim();
+        var arrivalTimeText = arrivalElement.textContent.trim();
+
+        var departureTime = parseTime(departureTimeText);
+        var arrivalTime = parseTime(arrivalTimeText);
+
+        var timeDifference = arrivalTime - departureTime;
+
+        var hours = Math.floor(timeDifference / 3600);
+
+        var minutes = Math.floor((timeDifference % 3600) / 60);
+
+        console.log("Time difference:", hours, "hours", minutes, "minutes");
+
+        // Display the time difference in the correct span
+        var timeDifferenceSpan = cardContainer.querySelector(".time-difference-span");
+        timeDifferenceSpan.textContent = hours + " h " + minutes;
+
+        // Log the time difference for debugging
+        console.log("Time difference:", hours, "h", minutes);
+    });
+
+    // Log a message after the forEach loop
+    console.log("Script executed successfully");
+} else {
+    console.error("cardContainers is not defined or empty");
+}
+
+// Function to parse time string and return Date object
+function parseTime(timeString) {
+    var timeComponents = timeString.split(/\s+/); // Split by whitespace
+    var time = timeComponents[0].split(":");
+    var hours = parseInt(time[0]);
+    var minutes = time[1] ? parseInt(time[1]) : 0; // Use provided minutes or default to 0
+
+    // Determine meridiem (AM/PM) from the last component of timeComponents
+    var meridiem = timeComponents[timeComponents.length - 1].toLowerCase();
+
+    // Adjust hours for PM if not 12-hour format
+    if (meridiem === "p.m." && hours !== 12) {
+        hours += 12;
+    } else if (meridiem === "a.m." && hours === 12) {
+        hours = 0;
+    }
+
+    return hours * 3600 + minutes * 60; // Convert hours and minutes to seconds since midnight
+}
+
+
+
+var bookmarkTriggers = document.querySelectorAll('.bookmark-trigger');
+
+    bookmarkTriggers.forEach(function(trigger) {
+        trigger.addEventListener('click', function(event) {
+            event.preventDefault();
+
+            var tripId = this.getAttribute('data-trip-id');
+            var bookmarkIcon = this.querySelector('.fas.fa-bookmark');
+
+            // Toggle the 'bookmarked' class
+            bookmarkIcon.classList.toggle('bookmarked');
+
+            // Send the bookmark status to the server
+            fetch('{% url "app:update_bookmark_status" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: 'trip_id=' + encodeURIComponent(tripId) + '&bookmarked=' + bookmarkIcon.classList.contains('bookmarked'),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response from the server if needed
+                if (data.success) {
+                    // Optionally, update the UI or handle other actions
+
+                    // Reload the page after updating the bookmark
+                    location.reload();
+                } else {
+                    // Handle errors from the server
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

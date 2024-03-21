@@ -1,0 +1,225 @@
+<!-- Change-name.html -->
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Yenda| Change Name{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}"> 
+
+    <style>
+        .account-details-container{
+            display: flex;
+            flex-direction:column;
+            margin-top: 50px; 
+            text-align: center;
+            margin-left: 0;
+            gap: 0;
+            border-radius: 10px;
+            padding: 20px 20px;
+            border-bottom: 1px solid var(--primary-color);
+
+        }
+
+        .user-name-label,
+        .user-email-label {
+            color: black;
+            font-weight: bold;
+        }
+
+        .user-name,
+        .user-email {
+            margin-left: 10px;
+            font-weight: lighter;
+        }
+
+        .account-details-btn-container{
+            margin-left: 10px;
+            width: 100px;
+        }
+
+        .change-name-container {
+            border: 1px solid black;
+            border-radius: 10px;
+            width: 300px;
+            height: 60px;
+            margin-top: 5px;
+        }
+
+        .change-name {
+            margin-top: 5px;
+            margin-left: 5px;
+        }
+
+        .sub-text {
+            font-size: 13px;
+            font-weight: lighter;
+            margin-left: 30px;
+         }/* When I hover on this text I want it to appear and should have a transition */
+
+        .fas {
+            margin-top: 10px;
+        }
+
+        a {
+            color: black;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+
+        
+        .fa-angle-right {
+            left: 275px;
+            position: relative;
+            bottom: 61px;
+        }
+
+     
+
+        .cover-image {
+            position: relative;
+            width: 100%; /* Adjust the width to match the desired size */
+            height: 200px; /* Adjust the height of the cover image */
+            background-color: var(--primary-color); /* Set the background color to red */
+        }
+
+
+        .cover-image img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .avatar-fallback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 10px solid white; /* Add a border to the profile picture */
+            border-radius: 50%;
+        }
+
+        .avatar-fallback img {
+            width: 150px; /* Adjust the size of the profile picture */
+            height: 150px; /* Adjust the size of the profile picture */
+            border-radius: 50%;
+        }
+
+        .name-change-container {
+            display: flex;
+            flex-direction: row;
+            gap: 50px;
+            justify-content: center;
+        }
+
+        .save-btn { 
+            border-radius: 20px;
+            margin-bottom: 20px;
+            width: 200px;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: var(--border-color);
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .save-btn:hover {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+        }
+
+        .cancel-btn {
+            border-radius: 20px;
+            border: 1px red solid;
+            background-color: white;
+            color: black;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .edit-btn-container{
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            margin-left: 500px;
+        }
+
+    @media (max-width: 780px) {
+        .name-change-container {
+            display: flex;
+            flex-direction: column;
+            gap: 50px;
+            justify-content: center;
+            margin-left: 85px;
+        }
+
+        .edit-btn-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            margin-left: 35px;
+        }
+    }
+      
+    </style>
+</head>
+
+<body>
+    <div class="cover-image">
+      
+        {% if request.user.profile_pic %}
+        <div class="avatar-fallback">
+            <img src="{{ request.user.profile_pic.url }}" class="rounded-circle" alt="Avatar" />
+        </div>
+        {% else %}
+            <div class="avatar-fallback">
+                <!-- Default profile picture -->
+                <img src="{% static 'images/default1.jpg' %}" class="rounded-circle" alt="Default Avatar" />
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="account-details-container">
+        <!-- User Name -->
+        <p class="user-name-label"><span class="user-name" style="font-size: 50px; font-weight: bold;">{{ request.user }}</span></p>
+        <!-- User Email -->
+        <p class="user-email-label"><span class="user-email" style="color: rgb(184, 178, 178);">{{ request.user.email }}</span></p>
+    </div>
+    <br><br>
+    <form method="post" action="" enctype="multipart/form-data">
+        {%csrf_token%}
+        <div class="name-change-container">
+            <label style="display: block; margin-bottom: 10px; for="id_first_name">First Name: <br><br><span>{{form.first_name}}</span></label>
+    
+            <label style="display: block; margin-bottom: 10px; for="id_last_name">Last Name:<br><br> <span>{{form.last_name}}</span> </label>      
+        </div>
+
+        <div class="name-change-container">
+            <label style="display: block; margin-bottom: 10px; for="id_username">Username<br><br><span>{{form.username}}</span></label>
+        
+
+            <label style="display: block; margin-bottom: 10px; for="id_username">E-mail<br><br><span>{{form.email}}</span></label>
+            
+        </div>
+
+        <br><br>
+
+        <div class="edit-btn-container">
+            <a href="{% url 'app:account-details' %}"><button type="button" class="cancel-btn"> Cancel </button></a>
+            <button type="submit" class="save-btn">Save</button>
+        </div>
+    </form>
+
+      
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <!-- Include QuaggaJS library -->
+    <script src="https://cdn.jsdelivr.net/npm/quagga"></script>
+</head>
+<body>
+    <h1>QR Code Scanner</h1>
+    <div id="scanner" style="width: 100%; height: auto;"></div>
+    <div id="result"></div>
+
+    <script>
+        Quagga.init({
+            inputStream: {
+                name: "Live",
+                type: "LiveStream",
+                target: document.querySelector('#scanner')
+            },
+            decoder: {
+                readers: ["code_128_reader", "ean_reader", "ean_8_reader", "code_39_reader", "code_39_vin_reader", "codabar_reader", "upc_reader", "upc_e_reader", "i2of5_reader", "2of5_reader", "code_93_reader"]
+            }
+        }, function (err) {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            console.log("Initialization finished. Ready to start");
+            Quagga.start();
+        });
+
+        Quagga.onDetected(function (data) {
+            var code = data.codeResult.code;
+            // Send the scanned code to the backend for verification
+            fetch('/verify-ticket/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ code: code })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle the response from the server
+                console.log(data);
+                document.getElementById('result').innerHTML = data.message;
+            })
+            .catch(error => console.error('Error:', error));
+        });
+
+        // Function to get CSRF token for Django
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>

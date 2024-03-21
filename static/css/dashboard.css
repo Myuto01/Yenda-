@@ -1,0 +1,241 @@
+:root {
+    /* ===== Colors ===== */
+    --primary-color: rgb(48, 150, 218);
+    --panel-color: #FFF;
+    --text-color: #000;
+    --secondary-color:  rgb(173,232,244);
+    --black-light-color: #707070;
+    --border-color: white;
+    --toggle-color: #DDD;
+    --box1-color: #005b96;
+    --box2-color: rgb(10, 197, 197);
+    --box3-color: rgb(174, 247, 247);
+    --title-icon-color: #fff;
+    --button: rgb(10, 197, 197);
+    --button-hover: rgb(174, 247, 247); 
+
+/* ====== Transition ====== */
+--tran-05: all 0.5s ease;
+--tran-03: all 0.3s ease;
+--tran-03: all 0.2s ease;
+}   
+
+body {
+    padding: 0;
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 300;
+}
+
+.grid-container {
+    display: block;
+  }
+
+h2 {
+    position: relative;
+    text-align: center;
+}
+.hello-user {
+    position: relative;
+    text-align: center;
+    font-size: 50px;
+}
+.welcome-message {
+    position: relative;
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 30px;
+}
+
+.choice {
+    background-color: white;
+    color: var(--text-color);
+    border-radius: 8px;
+    width: 100%;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.right-content {
+    width: 55%;
+    margin: auto;
+}
+
+.container {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    box-sizing: border-box;
+    border-radius: 8px;
+    margin-top: 20px;
+    gap: 30px;
+    width: 80%;
+    margin: 0 auto;
+    margin-bottom: 10px;
+}
+
+.choice.courier {
+    background-color: white;
+    color: black;
+}
+
+
+.choice.courier:hover {
+    background-color:  var(--border-color);
+    color: var(--primary-color);
+}
+
+.choice.courier.highlighted {
+    background-color: var(--primary-color);
+    color: var(--border-color);
+}
+
+.choice.travel.highlighted {
+    background-color: var(--primary-color);
+    color: var(--border-color);
+}
+
+.choice.travel.highlighted:hover {
+    background-color: var(--primary-color);
+    color: var(--border-color);
+}   
+
+.fas {
+    font-weight: 900;
+    font-size: 20px;
+    opacity: 80%;
+}
+
+.destination-container {
+    background-color: #f0f0f0;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    height: auto;
+    margin: 0 auto;
+    position: relative;
+    margin-top: 50px;
+}
+
+.destination-container p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+.destination-container .header {
+    text-align: center;
+}
+.search-containers {
+    display: flex;
+    flex-direction: column;
+}
+
+.search-containers label {
+    margin-bottom: 5px;
+}
+
+.input-with-icon {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-with-icon i {
+    margin-right: 10px; /* Adjust as needed to provide space between the icon and input */
+    color: #777; /* Adjust the color of the icon */
+}
+
+.input-with-icon input {
+    flex: 1; /* Take up remaining space */
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+label i {
+    margin-right: 10px; /* Adjust as needed to provide space between the icon and input */
+    color: #777; /* Adjust the color of the icon */
+}
+
+.search-containers {
+    display: flex;
+    flex-direction: column;
+}
+
+.search-containers input {
+    width: 95%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.search-containers button {
+    background-color: var(--primary-color);
+    color: #fff; /* White text color */
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.search-containers button:hover {
+    background-color: var(--secondary-color); 
+}
+
+.popular-places-container button {
+    background-color: var(--border-color); /* Blue button color */
+    color: var(--primary-color); 
+    font-weight: bold;
+    padding: 10px;
+    width: 100%;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+    .popular-places-container button:hover {
+        background-color: var(--secondary-color); 
+        color: var(--border-color);
+    }
+
+    .place-img {
+        border-radius: 20px;
+        cursor: pointer;
+    }
+
+    #imageContainer {
+    height: 500px; /* Adjust the height as needed */
+    overflow-y: scroll;
+    border: 1px solid #ccc; /* Optional: Add a border for visualization */
+    }
+
+    .scrollImage {
+    border-radius: 20px;
+    border: 1px solid black;
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: 10px;
+    }
+
+    li {
+        list-style: none;
+    }
+
+    @media (max-width: 780px) {
+        .destination-container {
+            background-color: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            width: 97%;
+            height: auto;
+            margin: 0 auto;
+            position: relative;
+            margin-top: 50px;
+        }
+        
+    }

@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Superuser Messages</title>
+    <style>
+        .search-recipient {
+            margin-left: 1000px;
+        }
+
+        .message-body {
+            margin-top: 0;
+            margin-left: 20px;
+        }
+
+        .sbt-btn {
+            padding: 0px 5px 0px 5px;
+            border-radius: 20px;
+            background-color: blueviolet;
+            color: white;
+            cursor: pointer;
+        }
+
+        .sbt-btn:hover {
+            background-color: rgb(163, 77, 243);
+        }
+
+        .msg-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+
+        @media (max-width: 780px) {
+            .msg-container {
+                display: flex;
+                flex-direction: column;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+{% endfor %}
+    <div class="search-recipient">
+        <h2>Search for Recipient</h2>
+        <form method="get">
+            <input type="text" name="search" placeholder="Search by User ID ">
+            <button type="submit">Search</button>
+        </form>
+
+        {% if recipients %}
+        <h2>Search Results</h2>
+        <ul>
+            {% for recipient in recipients %}
+            <li><a href="?recipient_id={{ recipient.id }}">{{ recipient.username }} - {{ recipient.id }}</a></li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+
+
+    <div class="message-body">
+        <h2>Send Message</h2>
+      
+            <form method="post">
+                {% csrf_token %}
+                <div class="msg-container">
+                    <label style="display: block; margin-bottom: 10px;" for="id_recipient">Recipient:</label>                     
+                    {{ form.recipient }}
+                    <label style="display: block; margin-bottom: 10px;" for="id_subject">Subject:</label>
+                    {{ form.subject }}
+                </div>
+                <label style="display: block; margin-bottom: 10px;" for="id_body ">Message Body :</label>
+                {{ form.body }}<br>
+                <button class="sbt-btn" type="submit">Send</button>
+            </form>
+    </div>
+
+<script>
+    $(document).ready(function() {
+        $('#reply-textarea').keypress(function(e) {
+            if (e.which === 13 && !e.shiftKey) {
+                e.preventDefault();
+                var cursorPos = $(this).prop('selectionStart');
+                var textBefore = $(this).val().substring(0, cursorPos);
+                var textAfter = $(this).val().substring(cursorPos);
+                $(this).val(textBefore + "\n" + textAfter);
+            }
+        });
+    });
+</script>
+</body>
+</html>
+{% endblock %}

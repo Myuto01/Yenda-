@@ -1,0 +1,546 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<html>
+<title>{% block title %}Yenda| Search-Result{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+<style>
+    .header-container {
+        background: rgb(219, 218, 218);
+        text-align: center;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+
+    .header-container .date {
+        font-weight: bold;
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .header-container .result-container {
+        font-size: 15px;
+    }
+
+    .header-container .result-container .result-text {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .header-container .result-container .result-text .fa {
+            font-weight: lighter;
+    }
+
+    .header-title {
+        text-align: center;
+    }
+
+    .card {
+        display: flex;
+        align-items: center;
+        width: 660px;
+        margin: 20px auto;
+        padding: 20px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        margin-bottom: 30px;
+        border: 1px dashed #999;
+    }
+
+    
+    .time-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: Arial, sans-serif;
+    }
+
+    .time-difference {
+        text-align: center;
+        margin-top: 8px;
+        color: black;
+    }
+
+    .line {
+        flex-grow: 1;
+        height: 1px;
+        width: 200px;
+        background-color: #000;
+    }
+
+    .dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background-color: #000; /* Black color for the dot */
+        border-radius: 50%;
+        margin: 0 10px;
+    }
+
+    .departure_time {
+        color: black;
+        font-weight: Bold;
+        margin-right: 10px;
+    }
+
+    .arrival_time {
+        margin-left: 10px;
+        color: black;
+        font-weight: 300;
+    }
+
+    .operator_container {
+        display: flex;
+        flex-direction: row;
+        gap: 340px;
+    }
+
+    .operator {
+        border: 1px solid black;
+        border-radius: 20px;
+        background: var(--primary-color);
+        color: #1848a0;
+        font-weight: bold;
+        padding: 0px 20px 0px 20px;
+        width: max-content;
+        top: 40px;
+        position: relative;
+    }
+
+    .price-container {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        position: relative;
+        left: 40%;
+    }
+
+    .price {
+        color: black;
+        font-weight: bold;
+        
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    .fas.fa-bookmark {
+        color: #888; /* Default color for non-bookmarked state */
+    }
+
+    /* Style for the bookmarked state */
+    .fas.fa-bookmark.bookmarked {
+        color: var(--primary-color); /* Customize the color for the bookmarked state */
+    }
+
+    li {
+        list-style: none;
+    }
+
+    .filter {
+        display: flex;
+        flex-direction: row;
+        gap: 0px;
+    }
+
+    /* Modal styles */
+    .modal {
+        display: none; /* Hide the modal by default */
+        position: fixed;
+        z-index: 999; /* Ensure it appears on top of other content */
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 600px;
+    }
+
+    /* Modal header */
+    .modal-header {
+        padding: 10px 20px;
+        border-bottom: 1px solid #ccc;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Modal body */
+    .modal-body {
+        padding: 20px 0;
+    }
+
+    /* Close button */
+    .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .num-results {
+
+    }
+
+    a {
+            text-decoration: none;
+        }
+
+    .hover-highlight:hover {
+        border: 2px dashed var(--primary-color);
+    }
+
+
+    @media (max-width: 780px) {
+        .modal {
+            display: none;
+            position: absolute;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .filter {
+            display: flex;
+            flex-direction: row;
+            gap: 0px;
+            position: relative;
+            left: 80%;
+            width: max-content;
+        }
+        .num-results {
+            bottom: 29px;
+            position: relative;
+        }
+        .card {
+            display: flex;
+            width: 360px;
+            margin: 20px auto;
+            right: 24px;
+            padding: 20px;
+            margin: auto auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border: 3px dashed #999;
+            height: 165px;
+        }
+
+        .line {
+            flex-grow: 1;
+            height: 1px;
+            width: 50px;
+            background-color: #000;
+        }
+
+        .operator_container {
+            display: flex;
+            flex-direction: row;
+            gap: 107px;
+        }
+
+        .operator {
+            width: max-content;
+            top: 25px;
+            right: 5px;
+            position: relative;
+        }
+
+        
+        
+        .price-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            left: 110px;
+            bottom: 15px;
+            position: relative;
+        }
+        
+    }
+
+
+    
+
+</style>
+<body>
+    {% for message in messages %}
+  <div class="alert alert-{{ message.tags }}">
+      {{ message }}
+  </div>
+  {% endfor %}
+<div class="header-container">
+    <div class="date" id="displayedDate">
+        <!-- The date will be displayed here -->
+    </div>
+    <div class="result-container">
+        <div class="result-text">
+            <span id="displayedDate"></span>
+            <span id="displayCurrentLocation"></span> <i class="fas fa-arrow-right"></i> <span id="displayDestination"></span>
+        </div>
+    </div> 
+</div>
+
+<div class="filter" id="filterButton">
+    <i class="fas fa-filter"></i>
+    <h6>Filter</h6>
+</div>
+
+<!-- Modal -->
+<div id="filterModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="close">&times;</span>
+            <h4>Sort By</h4>
+        </div>
+        <div class="modal-body">
+            <ul>
+                <li><p><a href="?sort_by=price_high_to_low"> Price (High to Low)</a></p></li>
+                <li><p><a href="?sort_by=price_low_to_high"> Price (Low to High)</a></p></li>
+                <li><p><a href="?sort_by=time_earliest_to_latest"> Departure Time (Earliest to Latest)</a></p></li>
+                <li><p><a href="?sort_by=time_latest_to_earliest"> Departure Time (Latest to Earliest)</a></p></li>
+            </ul>
+        </div>
+        
+    </div>
+</div>
+
+
+{% if results %}
+<p class="num-results">{{ results|length }} results found:</p>
+<ul>
+    {% for result in results %}
+        <li>
+            <a href="{% url 'app:select_tickets' result.id %}">
+                <div class="card hover-highlight" id="card"> <!-- Added hover-highlight class to the card -->
+                    <div class="time-container">
+                        <strong class="time departure"><strong class="departure_time">{{ result.departure_time|time:"h:i A" }}</strong></strong>
+                        <div class="line"></div>
+                        <div class="dot"></div>
+                        <div class="line"></div>&nbsp;
+                        <strong class="time arrival"><strong class="arrival_time">{{ result.estimated_arrival_time|time:"h:i A" }}</strong></strong>
+                    </div>
+                    <p class="time-difference">
+                        <span class="time-difference-span"></span>
+                    </p>  
+                   <!-- <div class="operator_container">  -->           
+                        <p class="operator">{{ result.bus_operator.username }}</p>
+                        <div class="price-container">
+                            <p class="price"><strong>K</strong> {{ result.price }} </p>
+                            <a href="#" class="bookmark-trigger" data-trip-id="{{ result.id }}"> <i class="fas fa-bookmark {% if result.bookmarked %}bookmarked{% endif %}"></i></a>
+                        </div>
+                </div>
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No results found.</p>
+{% endif %}
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var bookmarkTriggers = document.querySelectorAll(".bookmark-trigger");
+
+        bookmarkTriggers.forEach(function (bookmarkTrigger) {
+            bookmarkTrigger.addEventListener("click", function (event) {
+                event.preventDefault();
+                var tripId = bookmarkTrigger.dataset.tripId;
+                console.log("Bookmark clicked for trip ID: ", tripId);
+                // Here you can perform the necessary actions with the trip ID
+                // For example, you can use AJAX to send the trip ID to your server for bookmarking
+            });
+        });
+    });
+</script>
+
+<script>
+    // Function to retrieve and display values from localStorage
+
+        // Retrieve values from localStorage
+        var currentLocation = localStorage.getItem('currentLocation');
+        var destination = localStorage.getItem('destination');
+        var storedDate = localStorage.getItem('selectedDate');
+
+        // Display values in the designated spans
+        document.getElementById('displayCurrentLocation').innerText = currentLocation;
+        document.getElementById('displayDestination').innerText = destination;
+
+        // Format the date
+        var formattedDate = formatDateString(storedDate);
+
+        // Display the formatted date
+        document.getElementById('displayedDate').innerText = formattedDate;
+   
+
+  
+
+    // Function to format the date string
+    function formatDateString(dateString) {
+        var options = { weekday: 'long', day: 'numeric', month: 'long' };
+        var date = new Date(dateString);
+        return date.toLocaleDateString('en-US', options);
+    }
+
+    // Filter Modal 
+
+    // Get the modal
+    var modal = document.getElementById('filterModal');
+
+    // Get the button that opens the modal
+    var btn = document.getElementById('filterButton');
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName('close')[0];
+
+    // When the user clicks on the button, open the modal
+    btn.onclick = function() {
+        modal.style.display = 'block';
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = 'none';
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Inside the forEach loop
+// Retrieve or define cardContainers before this point
+var cardContainers = document.querySelectorAll(".card");
+
+// Ensure cardContainers is defined and not empty
+if (cardContainers && cardContainers.length > 0) {
+    // Inside the forEach loop
+    cardContainers.forEach(function (cardContainer) {
+        var departureElement = cardContainer.querySelector(".time.departure");
+        var arrivalElement = cardContainer.querySelector(".time.arrival");
+
+        var departureTimeText = departureElement.textContent.trim();
+        var arrivalTimeText = arrivalElement.textContent.trim();
+
+        var departureTime = parseTime(departureTimeText);
+        var arrivalTime = parseTime(arrivalTimeText);
+
+        var timeDifference = arrivalTime - departureTime;
+
+        // Calculate hours and minutes
+        var hours = Math.floor(timeDifference / (1000 * 60 * 60));
+        var minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+
+        // Display the time difference in the correct span
+        var timeDifferenceSpan = cardContainer.querySelector(".time-difference-span");
+        timeDifferenceSpan.textContent = hours + " h " + minutes;
+
+        // Log the time difference for debugging
+        console.log("Time difference:", hours, "h", minutes);
+    });
+
+    // Log a message after the forEach loop
+    console.log("Script executed successfully");
+} else {
+    console.error("cardContainers is not defined or empty");
+}
+
+// Function to parse time string and return Date object
+function parseTime(timeString) {
+    // Example: timeString is in the format "4:58 a.m."
+    var timeComponents = timeString.split(" ");
+    var time = timeComponents[0].split(":");
+    var hours = parseInt(time[0]);
+    var minutes = parseInt(time[1]);
+
+    if (timeComponents[1] === "p.m." && hours !== 12) {
+        hours += 12;
+    } else if (timeComponents[1] === "a.m." && hours === 12) {
+        hours = 0;
+    }
+
+    return new Date(0, 0, 0, hours, minutes);
+}
+});
+  
+</script>
+    
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var bookmarkTriggers = document.querySelectorAll('.bookmark-trigger');
+    
+        bookmarkTriggers.forEach(function(trigger) {
+            trigger.addEventListener('click', function(event) {
+                event.preventDefault();
+    
+                var tripId = this.getAttribute('data-trip-id');
+                var bookmarkIcon = this.querySelector('.fas.fa-bookmark');
+    
+                // Toggle the 'bookmarked' class
+                bookmarkIcon.classList.toggle('bookmarked');
+    
+                // Send the bookmark status to the server
+                fetch('{% url "app:update_bookmark_status" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
+                    body: 'trip_id=' + encodeURIComponent(tripId) + '&bookmarked=' + bookmarkIcon.classList.contains('bookmarked'),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle the response from the server if needed
+                    if (data.success) {
+                        // Optionally, redirect to the bookmarked trips page when a trip is bookmarked
+                        if (bookmarkIcon.classList.contains('bookmarked')) {
+                            window.location.href = '{% url "app:bookmarked_trips" %}';
+                        }
+                    } else {
+                        // Handle errors from the server
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    });
+    </script>
+
+{% endblock %}

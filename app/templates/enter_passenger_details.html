@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<title>{% block title %}Yenda| Get first ticket FREE!{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+<style>
+    .background-container {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    .background-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        filter: blur(5px); /* Add blur effect to the background image */
+        z-index: -1;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center; /* Center items horizontally */
+    }
+
+    .passenger-details-container {
+        margin-top: 10px;
+    }
+
+    .passenger-details-button {
+        border-radius: 20px;
+        padding: 10px 20px;
+        background-color: var(--primary-color);
+        color: var(--border-color);
+        cursor: pointer;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        
+    }
+
+    .passenger-details-button:hover {
+        color: var(--text-color);
+    }
+
+    .container .passenger-details-container .passenger-details-form {
+        background-color: rgb(230, 228, 228);
+        border-radius: 20px;
+        padding: 20px 30px;
+    }
+</style>
+
+
+    <div class="container">
+        <div class="passenger-details-container">
+            
+            <div class="passenger-details-form">
+                <form method="post" action="{% url 'app:enter_passenger_details' trip.id %}">
+                    <h3 style="color: var(--text-color);">Enter Passenger Details</h3><br>
+                    {% csrf_token %}
+                    {{ formset.management_form }}
+
+                    {% for form in formset %}
+                    <strong style="display: block; margin-bottom: 10px; color: var(--primary-color);" >Passenger {{forloop.counter}}</strong>
+                    <label style="display: block; margin-bottom: 10px;"  for="id_name"><i class="fas fa-user"></i>
+                        Name</label>
+                    {{ form.name}}<br><br>
+
+                    <label style="display: block; margin-bottom: 10px;"  for="id_phonenumber"><i class="fas fa-phone"></i>
+                        Phone Number</label>
+                    {{ form.phonenumber}}<br><br>
+                    {% endfor %}
+
+                    <input type="submit" value="Submit"  class="passenger-details-button">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock %}

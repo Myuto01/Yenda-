@@ -1,0 +1,190 @@
+{% extends 'nav.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <title>{% block title %}Yenda{% endblock %}</title>
+</head>
+<body>
+    
+    <h1>Bus Operator Dashboard</h1>
+    {% if user.is_authenticated %}
+    Welcome, {{ user.username }}!
+    {% else %}
+        Please log in.
+    {% endif %}
+
+    <a href="{% url 'reservation_system:detail-entry' %}">Trips Scheduled</a>
+    <a href="{% url 'reservation_system:qrcode-scanner' %}">QR Code Scanner</a>
+    <div class="dash-content">
+        <div class="overview">
+            <div class="title">
+                <i class="uil uil-user"></i>
+                <span class="text"> 
+                    {% if user.is_authenticated %}
+                        Welcome, {{ user.username }}!
+                        {% else %}
+                            Please log in.
+                    {% endif %}
+                </span>
+            </div>
+
+
+            <div class="boxes">
+                <div class="box box1">
+                    <i class="fas fa-receipt"></i> <span class="text">Orders</span>
+                    <canvas id="doughnutChart" ></canvas>
+                    
+                </div>
+
+                <div class="box box2"> 
+                    <i class="fas fa-chart-line"></i>  <span class="text">Reports</span>      
+                    <canvas id="areaChart" width="625px" height="229px"></canvas>   
+                </div>
+                
+            </div>
+        </div>
+        <br>
+
+       
+
+        <div class="activity">
+            <div class="title">
+                <i class="uil uil-clock-three"></i>
+                <span class="text">Upcoming Trips</span>
+            </div>
+
+            <div class="activity-data">
+                <div class="data names">
+                    <span class="data-title">Driver</span>
+                    <span class="data-list">Prem Shahi</span>
+                    <span class="data-list">Deepa Chand</span>
+                    <span class="data-list">Manisha Chand</span>
+                    <span class="data-list">Pratima Shahi</span>
+                    <span class="data-list">Man Shahi</span>
+                    <span class="data-list">Ganesh Chand</span>
+                    <span class="data-list">Bikash Chand</span>
+                </div>
+                <div class="data email">
+                    <span class="data-title">Status</span>
+                    <span class="data-list">premshahi@gmail.com</span>
+                    <span class="data-list">deepachand@gmail.com</span>
+                    <span class="data-list">prakashhai@gmail.com</span>
+                    <span class="data-list">manishachand@gmail.com</span>
+                    <span class="data-list">pratimashhai@gmail.com</span>
+                    <span class="data-list">manshahi@gmail.com</span>
+                    <span class="data-list">ganeshchand@gmail.com</span>
+                </div>
+                <div class="data joined">
+                    <span class="data-title">From</span>
+                    <span class="data-list">2022-02-12</span>
+                    <span class="data-list">2022-02-12</span>
+                    <span class="data-list">2022-02-13</span>
+                    <span class="data-list">2022-02-13</span>
+                    <span class="data-list">2022-02-14</span>
+                    <span class="data-list">2022-02-14</span>
+                    <span class="data-list">2022-02-15</span>
+                </div>
+                <div class="data type">
+                    <span class="data-title">To</span>
+                    <span class="data-list">Bank</span>
+                    <span class="data-list">Bank</span>
+                    <span class="data-list">Money Lender</span>
+                    <span class="data-list">Bank</span>
+                    <span class="data-list">Money Lender</span>
+                    <span class="data-list">Money Lender</span>
+                    <span class="data-list">Bank</span>
+                </div>
+                <div class="data status">
+                    <span class="data-title">Time</span>
+                    <span class="data-list">Successful</span>
+                    <span class="data-list">Successful</span>
+                    <span class="data-list">Successful</span>
+                    <span class="data-list">Successful</span>
+                    <span class="data-list">Successful</span>
+                    <span class="data-list">Successful</span>
+                    <span class="data-list">Successful</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    var doughnutCtx = document.getElementById('doughnutChart').getContext('2d');
+    var doughnutChart = new Chart(doughnutCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Courier', 'Travel'],
+            datasets: [{
+                label: 'Sales',
+                data: [65, 59],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            
+        }
+    });
+
+    var areaCtx = document.getElementById('areaChart').getContext('2d');
+    var areaChart = new Chart(areaCtx, {
+        type: 'line',
+        data: {
+            labels: ['10am', '11am', '12am', '01am', '02am', '03am', '04am'],
+            datasets: [{
+                label: 'Sales',
+                data: [0, 20, 40, 60, 80, 100],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+           
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+    // create a function to update the date and time
+    function updateDateTime() {
+        // create a new `Date` object
+        const now = new Date();
+
+        // get the current date and time as a string
+        const currentDateTime = now.toLocaleString();
+        console.log(currentDateTime); // output: "7/20/2021, 2:28:15 PM" (will vary depending on your time zone)
+
+        // update the `textContent` property of the `span` element with the `id` of `datetime`
+        var datetimeElement = document.getElementById('datetime');
+        if (datetimeElement) {
+            datetimeElement.textContent = currentDateTime;
+        } else {
+            console.error("Element with id 'datetime' not found.");
+        }
+    }
+
+    // call the `updateDateTime` function every second
+    setInterval(updateDateTime, 1000);
+    
+    // Call updateDateTime initially to avoid initial delay
+    updateDateTime();
+});
+
+</script>
+</body>
+</html>
+{% endblock %}

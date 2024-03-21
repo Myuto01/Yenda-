@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Yenda| Tickets{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+
+    <style>
+        li{
+            list-style: none;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: center; /* Center items horizontally */
+        }
+
+        .ticket {
+            position: relative;
+            width: 700px; /* Adjust width as needed */
+            padding: 20px;
+            background-color: #fff;
+            border: 3px dotted #000;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            background-color: var(--secondary-color);
+            color: #fff;
+        
+        }
+
+        .ticket:before,
+        .ticket:after {
+            content: '';
+            position: absolute;
+            top: 50%; /* Position at the vertical center */
+            width: 40px; /* Adjust size of circles */
+            height: 40px; /* Adjust size of circles */
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 50%; /* Make circles */
+            transform: translateY(-50%); /* Center vertically */
+        }
+
+        .ticket:before {
+            left: -22px; /* Adjust horizontal position */
+        }
+
+        .ticket:after {
+            right: -22px; /* Adjust horizontal position */
+        }
+
+        .ticket-content {
+            /* Adjust padding to accommodate the circles */
+            padding: 10px;
+        }
+
+        .trip-time-container{
+            display: flex;
+            flex-direction: row;
+            gap: 200px;
+        }
+
+        .trip-origin-destination-container{
+            display: flex;
+            flex-direction: row;
+            gap: 200px;
+        }
+
+        .bus-operator-ticket{
+            display: flex;
+            flex-direction: row;
+            gap: 300px;
+        }
+
+        .ticket-logo img{
+            width: 50px;
+            height: 50px;
+            margin-bottom: 20px;
+        }
+
+        a{
+            color: #000;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: rgb(255, 207, 207);
+            text-decoration: none;
+        }
+
+        .arrived-button{
+            cursor: pointer;
+            border-radius: 20px;
+            padding: 0px 5px 0px 5px;
+        }
+
+        .arrived-button:hover {
+           color: var(--secondary-color);
+        }
+
+        
+        .ticket-history-button-container{
+            display: flex;
+            flex-direction: row-reverse;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .history-btn {
+            border-radius: 20px;
+            padding: 0px 5px 0px 5px;
+            cursor: pointer;
+            
+        }
+
+        .history-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .ticket-btn-container {
+            display: flex;
+            flex-direction: row;
+            gap: 451px;
+        }
+
+        @media (max-width: 780px) {
+            .container {
+                position: relative;
+                display: flex;
+                flex-direction: row;
+                box-sizing: border-box;
+                border-radius: 8px;
+                margin-top: 20px;
+                gap: 50px;
+                right: 30px;
+                width: 370px;
+                height: auto;
+                margin: 0 auto;
+                margin-bottom: 0;
+            }
+
+            .ticket {
+                width: 370px;
+            }
+
+            .bus-operator-ticket {
+                gap: 88px;
+            }
+
+            .trip-origin-destination-container {
+                gap: 60px;
+            }
+
+			.trip-time-container {
+				gap: 46px;
+			}
+
+            .ticket-btn-container {
+                display: flex;
+                flex-direction: row;
+                gap: 97px;
+            }
+            
+            .qrcode-container {
+                width: 350px;
+                right: 20px;
+            }
+    }
+    </style>
+</head>
+
+<body>
+    <div class="ticket-history-button-container">
+        <a  id="previousTicketsButton"><button type="button" class="history-btn" style="background-color: white;">Previous Tickets</button></a><br><br>
+        <a href="{% url 'app:tickets' %}"><button type="button" class="history-btn" style="color: var(--box1-color);">Active Tickets</button></a>
+    </div>
+    <ul>
+        {% for ticket in tickets %}
+            <li>
+                    <div class="container">
+                        <div class="ticket">
+								<div class="ticket-content">
+									<div class="ticket-logo"><img src="{% static 'images/logo.png' %}" alt="Logo"></div>
+									<div class="bus-operator-ticket">
+										<p><strong style="color: #1848a0;  font-weight: bold ;">Bus Operator:</strong><span style="color: #000;"><br> {{ ticket.trip.bus_operator}}</span></p>
+										<p><strong style="color: #1848a0; font-weight: bold">Ticket ID:</strong><span style="color: #000;"><br> {{ ticket.id}}</span></p>
+									</div>
+								
+									<p><strong style="color: #1848a0; font-weight: bold">Passenger Name:</strong><span style="color: #000;"><br> {{ ticket.passenger_name}}</span></p>
+									<div class="trip-origin-destination-container">
+										<p><strong style="color: #1848a0; font-weight: bold">Origin:</strong><span style="color: #000;"><br> {{ ticket.trip.origin}}</span></p>
+										<span>&#128652;</span>
+										<p><strong style="color: #1848a0; font-weight: bold">Destination:</strong><span style="color: #000;"><br> {{ ticket.trip.destination}}</span></p>
+									</div>
+								<br>
+									<div class="trip-time-container">
+										<p><strong style="color: #1848a0; font-weight: bold">Trip Date:</strong><span style="color: #000;"><br> {{ ticket.trip.departure_date}}</span> </p>
+										<p><strong style="color: #1848a0; font-weight: bold  ">Departure Time:</strong><span style="font-weight: bold; font-size: 20px; color: #000;"><br> {{ ticket.trip.departure_time }}</span></p>
+									</div>
+									
+									<div class="ticket-btn-container">
+                                        <a href="{% url 'app:update_ticket_active_status' ticket.id %}?button_clicked=true"><button type="button" class="arrived-button" id="arrived-button">Arrived</button></a>
+                                        <a href="{% url 'app:ticket_success' ticket.trip.id %}" ><button type="button" class="arrived-button"> More Details </button></a>
+                                    </div>
+							</div>
+                        </div>
+                    </div>
+            </li>
+        {% endfor %}
+    </ul> 
+
+
+ 
+</body>
+<script>
+    document.getElementById("previousTicketsButton").addEventListener("click", function(event) {
+      event.preventDefault();
+      window.location.href = "{% url 'app:previous-tickets' %}";
+
+      console.log("click"); // Print "click" to the console on button click
+
+    });
+  </script>
+</html>
+{% endblock %}
+

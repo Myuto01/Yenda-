@@ -1,0 +1,264 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<title>{% block title %}{{ trip.bus_operator }} Ticket Confirmation{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+<style>
+    body {
+        overflow-y: scroll;
+    }
+
+    .trip-details-container {
+        margin-left: 10px;
+        background-color: var(--border-color);
+    }
+
+    .destination-origin-container {
+        display: flex;
+        flex-direction: row;
+        gap: 40px;
+    }
+
+    .container {
+        display: flex;
+        justify-content: center; /* Center items horizontally */
+    }
+
+    .confirmation-form-container {
+        background-color: rgb(230, 228, 228);
+        border-radius: 20px;
+        padding: 20px 30px;
+    }
+
+    .buyer-name,
+    .buyer-number {
+        font-weight: bold;
+    }
+
+    .confirm-btn {
+        border-radius: 20px;
+        padding: 10px 20px;
+        background-color: var(--primary-color);
+        color: var(--border-color);
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        width: 200px;
+    }
+
+    .cancel-btn {
+        border-radius: 20px;
+        border: 1px red solid;
+        background-color: white;
+        color: black;
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+
+    .confirm-btn:hover {
+        color: black;
+       
+    }
+
+
+    .cancel-btn:hover {
+        background: var(--primary-color);
+        color: black;
+    }
+
+    a:hover {
+        text-decoration: none;
+    }
+
+    @media (max-width: 630px) {
+        .confirm-btn {
+            width: 110px;
+        }
+
+        .cancel-btn {
+            width: 100px;
+        }
+    }
+
+    /* Modal styles */
+    #phone-number-modal {
+        display: none; /* Initially hidden */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0, 0, 0, 0.4); /* Transparent black background */
+    }
+
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 30%; /* Modal content width */
+        animation-name: fadeIn; /* Optional fade in animation */
+    }
+
+    @keyframes fadeIn {
+        from {opacity: 0;}
+        to {opacity: 1;}
+    }
+
+    .close-modal {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close-modal:hover,
+    .close-modal:focus {
+        color: red;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    @media screen and (max-width: 630px) {
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            animation-name: fadeIn;
+        }
+        
+    }
+</style>
+<!-- ticket_confirmation.html -->
+
+<body>
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+
+    <div class="trip-details-container">
+        <strong style="color: black;">Trip Details</strong><br>
+        <p><strong style="color: black;">Bus Operator:</strong> {{ trip.bus_operator }}</p>
+        <div class="destination-origin-container">
+            <p><strong style="color: black;">Origin:</strong>  {{ trip.origin }}</p>
+            <i class="fas fa-arrow-right"></i>
+            <p><strong style="color: black;">Destination:</strong> {{ trip.destination }}</p>
+        </div>
+        <p><strong style="color: black;">Price per ticket: K</strong> {{ trip.price }}</p>
+        <p><strong style="color: black;">Total Price: K</strong>  {{ total_price }}</p>
+    </div>
+    <div class="container">
+        <div class="confirmation-form-container">
+            <div>
+                <h2>Passenger Details</h2>
+                {% for passenger in passenger_details_session %}
+                    <strong style="color: var(--primary-color);">Passenger: {{ forloop.counter }}</strong>
+                    <p><span class="buyer-name"><i class="fas fa-user"></i>
+                            Name: </span><br> {{ passenger.name }}</p>
+                    <p><span class="buyer-number"><i class="fas fa-phone"></i>
+                            Number:</span><br> {{ passenger.phonenumber }}</p>
+                {% endfor %}
+                <br><br>
+                <a href="{% url 'app:ticket-cancel' %}">
+                    <button type="button" class="cancel-btn"> Cancel </button>
+                </a>
+                <button type="button" class="confirm-btn" id="confirm-payment"> Confirm </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="phone-number-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2>Enter Phone Number</h2>
+            <p style="color: #aaaaaa;">Ensure your number is registered with a mobile money provider, i.e. MTN, Airtel or Zamtel</p>
+            <form id="phone-number-form" method="post" action="{% url 'app:ticket_confirmation' trip_id=trip.id %}">
+                {% csrf_token %}
+                <label for="modal-phone-number">Phone Number:</label>
+                <input type="tel" id="modal-phone-number" name="modal_phone_number" placeholder="Enter your phone number" required>
+                <br><br>
+                <button type="submit" class="confirm-btn"id="confirm-number">Confirm</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+       
+    
+        // Get confirm button and modal elements
+        const confirmButton = document.getElementById('confirm-number');
+        const modal = document.getElementById('phone-number-modal');
+        const closeModal = document.getElementsByClassName("close-modal")[0];
+    
+        // Get confirm button click event
+        confirmButton.addEventListener('click', function() {
+            // Submit modal form data asynchronously
+            fetch(document.getElementById('phone-number-form').action, {
+                method: 'POST',
+                body: new FormData(document.getElementById('phone-number-form')),
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken') // Include CSRF token in headers
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // If modal form submission is successful, submit the first form
+                    document.getElementById('ticketForm').submit();
+                } else {
+                    console.error('Modal form submission failed');
+                    // Handle modal form submission failure
+                }
+            })
+            .catch(error => {
+                console.error('An error occurred during modal form submission:', error);
+                // Handle any other errors
+            });
+        });
+    
+        // Function to get CSRF token from cookie
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        
+        document.getElementById('confirm-payment').addEventListener('click', function(e) {
+            console.log("clicked")
+            e.preventDefault(); // Prevent default form submission on Enter key press
+            modal.style.display = "block"; // Display modal when first form is submitted
+        });
+
+        // Get close modal button click event
+        closeModal.addEventListener('click', function() {
+            modal.style.display = "none"; // Hide modal on close button click
+        });
+    
+        // Get window click event (close modal when clicking outside)
+        window.addEventListener('click', function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        });
+    </script>
+    
+{% endblock %}
+</body>

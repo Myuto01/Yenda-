@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<html>
+<title>{% block title %}Yenda| Popular Places{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{% static 'css/popular_places.css' %}">
+<body>
+<h1>Popular Places To Visit</h1>
+<div class="container">
+    <div class="column">
+      <table>
+        <tr>
+          <div class="element">
+            <img src="https://picsum.photos/300/200?random=1" alt="Image 1">
+          </div>
+        </tr>
+        
+        <tr>
+          <div class="element">
+            <img src="https://picsum.photos/300/200?random=2" alt="Image 2">
+          </div>
+        </tr>
+        
+        <tr>
+           <div class="element">
+            <img src="https://picsum.photos/300/200?random=3" alt="Image 3">
+          </div>
+        </tr>
+      </table>
+    </div>
+    <div class="column">
+      <table>
+        <tr>
+          <div class="element">
+            <img src="https://picsum.photos/300/200?random=4" alt="Image 4">
+          </div>
+        </tr>
+        
+        <tr>
+          <div class="element">
+            <img src="https://picsum.photos/300/200?random=5" alt="Image 5">
+          </div>
+        </tr>
+        
+        <tr>
+           <div class="element">
+            <img src="https://picsum.photos/300/200?random=6" alt="Image 6">
+          </div>
+        </tr>
+      </table>
+    </div>
+</div>
+</body>
+{% endblock %}
+</html>

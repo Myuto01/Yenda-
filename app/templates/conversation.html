@@ -1,0 +1,244 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Yenda| Conversation{% endblock %}</title>
+
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .messages-container {
+        max-height: 70vh;
+        overflow-y: scroll;
+        margin-bottom: 100px;
+    }
+
+    #reply-form {
+        position: fixed; /* Fixed position at the bottom of the viewport */
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    
+    h1 {
+        text-align: center;
+        margin-top: 20px;
+    }
+    
+    .messages-container {
+        padding: 20px;
+    }
+    
+    .message {
+        max-width: 70%;
+        border-radius: 10px;
+        padding: 10px;
+        clear: both;
+        word-wrap: break-word;
+        position: relative; /* Required for positioning the options menu */
+    }
+    
+    .sender-message {
+        background-color: var(--secondary-color);
+        float: right;
+    }
+    
+    .recipient-message {
+        background-color: #ECE5DD;
+        float: left;
+    }
+    
+    .message p {
+        margin: 5px 0;
+    }
+    
+    .message-options {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        cursor: pointer;
+    }
+    
+    .options-menu {    
+        display: none;
+        right: 2px;
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        padding: 5px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        z-index: 100; /* Ensure menu appears above other elements */
+    }
+    
+    .options-menu a {
+        display: block;
+        color: #333;
+        text-decoration: none;
+        padding: 5px;
+    }
+    
+    .options-menu a:hover {
+        background-color: #f0f0f0;
+    }
+
+    .msg-txt-area {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .reply-input{
+        width: 1000px;
+    }
+
+    .reply-btn {
+        border-radius: 50%;
+        width: 150px;
+        height: 50px;
+        padding: 0px 5px 0px 5px;
+        cursor: pointer;
+        background: var(--primary-color);
+    }
+
+    @media (max-width: 780px) {
+        .sender-message {
+            background-color: var(--secondary-color);
+            float: right;
+            margin-bottom: 20px;
+        }
+
+        .recipient-message {
+            background-color: #ECE5DD;
+            float: left;
+            margin-bottom: 20px;
+        }
+        
+    }
+    </style>
+</head>
+<body>
+    <h1>Conversation with {{ sender.username }}</h1>
+
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="message-container">
+            <div class="message {% if message.sender == request.user %}sender-message{% else %}recipient-message{% endif %}">
+                <p><strong>From:</strong> {{ message.sender.username }}</p>
+                <p><strong>Subject:</strong> {{ message.subject }}</p>
+                <p><strong>Message:</strong> {{ message.body|safe }}</p>
+                <p><strong>Received:</strong> {{ message.timestamp }}</p>
+                {% if message.sender == request.user %}
+                <div class="message-options">
+                    <span class="options-trigger" onclick="toggleOptions(this)">...</span>
+                    <div class="options-menu">
+                        <a href="{% url 'app:edit_message' message.id %}">Edit</a>
+                        <a href="{% url 'app:delete_message' message.id %}">Delete</a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <p>No messages.</p>
+        {% endfor %}
+    </div>
+
+    <form id="reply-form" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="recipient" value="{{ sender.id }}">
+        <input type="hidden" name="subject" value="Re: Conversation">
+        
+        <div class="msg-txt-area">
+            <textarea style="resize: none;" class="reply-input" name="body" id="reply-textarea" placeholder="Type your reply here"></textarea><br>
+            <button class="reply-btn" type="submit"><i class="fas fa-paper-plane" style="color: black;"></i>
+            </button>
+        </div>
+
+    </form>
+
+    <!-- Notification icon for new messages -->
+    <span id="message-notification" class="notification-dot"></span>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Function to mark messages as read
+            function markMessagesAsRead() {
+                // AJAX request to mark messages as read
+                $.ajax({
+                    url: '{% url "app:mark_messages_as_read" %}',
+                    method: 'POST',
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        sender_id: '{{ sender.id }}'
+                    },
+                    success: function(response) {
+                        // Handle success response if needed
+                        console.log('Messages marked as read');
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle error if needed
+                        console.error('Error marking messages as read:', error);
+                    }
+                });
+            }
+
+            // Call the function to mark messages as read when the page is loaded
+            markMessagesAsRead();
+        });
+    </script>
+        <script>
+            $(document).ready(function() {
+                $('#reply-textarea').keypress(function(e) {
+                    if (e.which === 13 && !e.shiftKey) {
+                        e.preventDefault();
+                        var cursorPos = $(this).prop('selectionStart');
+                        var textBefore = $(this).val().substring(0, cursorPos);
+                        var textAfter = $(this).val().substring(cursorPos);
+                        $(this).val(textBefore + "\n" + textAfter);
+                    }
+                });
+            });
+        </script>
+
+     <script>
+        // Function to convert plain text URLs into clickable links
+        function linkifyText(text) {
+            return text.replace(/(https?:\/\/[^\s]+)/g, function (url) {
+                return '<a href="' + url + '" target="_blank">' + url + '</a>';
+            });
+        }
+
+        // Apply linkifyText function to all elements with the 'message-body' class
+        $('.message-container p').each(function() {
+            var messageText = $(this).html();
+            $(this).html(linkifyText(messageText));
+        });
+    </script>
+
+
+    <script>
+        function toggleOptions(trigger) {
+            var optionsMenu = trigger.nextElementSibling;
+            if (optionsMenu.style.display === 'block') {
+                optionsMenu.style.display = 'none';
+            } else {
+                optionsMenu.style.display = 'block';
+            }
+        }
+    </script>
+
+
+</body>
+</html>
+{% endblock %}

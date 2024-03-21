@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<title>{% block title %}Yenda| Trip booking, save up to 25%{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+
+<style>
+    
+
+    .form-container {
+        background-color: rgb(230, 228, 228);
+        border-radius: 20px;
+        padding: 20px 30px;
+        width: 50%;
+        text-align: center;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+
+    .number-of-tickets-label {
+        font-weight: bold;
+        font-size: 20px;
+        color: var(--text-color);
+    }
+
+    .number-of-tickets-button {
+        border-radius: 20px;
+        padding: 10px 20px;
+        background-color: var(--primary-color);
+        color: var(--border-color);
+        cursor: pointer;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .number-of-tickets-button:hover {     
+        background-color: var(--primary-color);
+        color: var(--text-color);
+       
+    }
+
+    @media (max-width: 780px) {
+        .form-container {
+            background-color: rgb(230, 228, 228);
+            border-radius: 20px;
+            padding: 20px 30px;
+            width: 90%;
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+       
+    }
+</style>
+
+<!-- select_tickets.html -->
+
+    <div class="form-container">
+        <form method="post">
+            {% csrf_token %}
+            <label class="number-of-tickets-label">Enter Number Of Tickets</label><br>
+            {{ form.number_of_tickets }}<br><br>
+            <button type="submit" class="number-of-tickets-button">Next <i class="fas fa-angle-right"></i>
+            </button>
+        </form>
+    </div>
+
+{% endblock %}

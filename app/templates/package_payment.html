@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Yenda| Package Payment {% endblock %}</title>
+    <style>
+        .pkg-pymnt-form {
+            background-color: rgb(230, 228, 228);
+            margin: auto;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+        }
+
+        #confirm-pkg-btn {
+            border-radius: 20px;
+            margin-left: 900px;
+            margin-bottom: 20px;
+            width: 200px;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: var(--border-color);
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #confirm-pkg-btn:hover {
+            color: var(--text-color);
+        }
+
+        .pkg_payment-input {
+            border-radius: 5px;
+            width: 450px;
+            height: 30px;
+        }
+
+        label {
+            color: var(--secondary-color);
+        }
+
+        .header-container {
+            background: rgb(219, 218, 218);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header-container .date {
+            font-weight: bold;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .header-container .result-container {
+            font-size: 15px;
+        }
+
+        .header-container .result-container .result-text {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .header-container .result-container .result-text .fa {
+                font-weight: lighter;
+        }   
+
+        .id-courier-container {
+            display: flex;
+            flex-direction: row;
+            gap: 400px;
+            margin-bottom: 50px;
+            margin-left: 10px;
+        }
+
+        .sender-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-left: 10px;
+        }
+
+        .receiver-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .sender-receiver-info-container {
+            display: flex;
+            flex-direction: row;
+            gap: 400px;
+        }
+        
+        @media (max-width:780px) {
+            .id-courier-container {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-bottom: 50px;
+                margin-left: 10px;
+            }
+
+            .pkg_payment-input {
+                border-radius: 5px;
+                width: 350px;
+                height: 30px;
+            }
+
+            .sender-receiver-info-container {
+                display: flex;
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            #confirm-pkg-btn {
+                border-radius: 20px;
+                margin: auto 79px;
+                margin-bottom: 20px;
+                width: 200px;
+                padding: 10px 20px;
+                background-color: var(--primary-color);
+                color: var(--border-color);
+                cursor: pointer;
+                border: none;
+                font-size: 16px;
+                cursor: pointer;
+            }
+            
+        }
+    </style>
+</head>
+<body>
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    <h1 style="text-align: center;">Package Payment</h1>
+    <p style="text-align: center;"><strong style="color: var(--secondary-color);">Note:</strong> Prices may change due to incorrect package details.</p>
+    <div class="header-container">
+        <div class="result-container">
+            <div class="result-text">
+                <span id="displayCurrentLocation"></span> <i class="fas fa-arrow-right"></i> <span id="displayDestination"></span>
+            </div>
+        </div> 
+    </div>
+    <div class="pkg-pymnt-form" >
+        <form method="post">
+            <br><br>
+            {% csrf_token %}
+            {{ form.errors }}
+
+            <input type="hidden" name="current_location" id="currentLocationInput">
+            <input type="hidden" name="destination" id="destinationInput">
+            
+            <div class="id-courier-container">
+                <label style="display: block; margin-bottom: 10px;" for="id_package_id">Package ID:<br><br> {{ form.package_id }}</label>                     
+                
+                <label style="display: block; margin-bottom: 10px;" for="id_courier">Courier:<br><br> {{ form.courier }}</label>                     
+                
+            </div>
+
+            <div class="sender-receiver-info-container">
+                <div class="sender-info">
+                    <label style="display: block; margin-bottom: 10px;" for="id_sender_name">Sender Name:<br><br>  {{ form.sender_name }}</label>                     
+                   
+                    <label style="display: block; margin-bottom: 10px;" for="id_sender_number">Sender Number:<br><br> {{ form.sender_number }}</label>                     
+                    
+                </div>
+
+                <div class="receiver-info">
+                    <label style="display: block; margin-bottom: 10px;" for="id_receiver_name">Receiver Name:</label>                     
+                    {{ form.receiver_name }}
+                    <label style="display: block; margin-bottom: 10px;" for="id_receiver_name">Receiver Number:</label>                     
+                    {{ form.receiver_number }}
+                </div>
+            </div><br><br>
+
+
+            <label style="display: block; margin-left: 10px; margin-bottom: 10px;" for="id_amount">Amount:<br><br> {{ form.amount }}</label>                     
+            <br><br>
+            <button id="confirm-pkg-btn" type="submit">Pay</button>
+            <br><br>
+        </form>
+    </div>
+
+    <script>
+        // Retrieve values from localStorage
+        var currentLocation = localStorage.getItem('currentLocation');
+        var destination = localStorage.getItem('destination');
+    
+        // Display values in the designated spans
+        document.getElementById('displayCurrentLocation').innerText = currentLocation;
+        document.getElementById('displayDestination').innerText = destination;
+    
+        // Set values of hidden input fields
+        document.getElementById('currentLocationInput').value = currentLocation;
+        document.getElementById('destinationInput').value = destination;
+    
+        // Attach event listener to form submission
+        document.querySelector('form').addEventListener('submit', function (event) {
+            // Append current location and destination to form data
+            var formData = new FormData(this);
+            formData.append('current_location', currentLocation);
+            formData.append('destination', destination);
+    
+            // Perform any additional processing if needed
+    
+            // Update the form data before submission
+            event.formData = formData;
+        });
+    </script>
+    
+    
+
+</body>
+</html>
+{% endblock %}

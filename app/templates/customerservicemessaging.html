@@ -1,0 +1,33 @@
+<h1>Your Messages</h1>
+<ul>
+    {% for message in messages %}
+    <li>
+        {% if message.sender == request.user %}
+        <strong>You:</strong>
+        {% else %}
+        <strong>{{ message.sender }}</strong>
+        {% endif %}
+        {{ message.message }} ({{ message.timestamp }})
+    </li>
+    {% endfor %}
+</ul>
+
+<h1>Send Message</h1>
+<form method="post">
+    {% csrf_token %}
+    <textarea name="content"></textarea>
+    <button type="submit">Send</button>
+</form>
+
+<h1>Received Messages</h1>
+<ul>
+    {% for message in messages %}
+    <li>
+        <strong>{{ message.sender }}</strong>
+        {{ message.message }} ({{ message.timestamp }})
+        {% if not message.read %}
+        <a href="{% url 'app:mark_read' message.id %}">Mark as Read</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>

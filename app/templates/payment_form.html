@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Payment Form</title>
+    {% load static %}  
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+<body>
+    <h1>Payment Details</h1>
+
+    <form method="post" action="{% url 'app:initiate_payment' %}">
+            {% csrf_token %}  <div>
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" name="amount" required>
+        </div>
+
+        <div>
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" required>
+        </div>
+        <button type="submit">Proceed to Payment</button>
+    </form>
+
+    {% if messages %}
+        <ul class="error-messages">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

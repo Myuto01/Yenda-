@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <head>
+        <title>{% block title %}Yenda| About & Info{% endblock %}</title>
+        <link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+        <style>
+            h1 {
+                text-align: center;
+                margin-top: 10px;
+                border-bottom: 1px solid var(--primary-color); /* Change color as needed */
+                border-bottom-right-radius: 100px;
+                border-bottom-left-radius: 100px;
+                margin-bottom: 30px;
+            }
+
+            .about-info-head {
+                margin-left: 10px;
+                border-bottom: 1px solid var(--primary-color); /* Change color as needed */
+                width: 100px;
+            }
+
+            .ts,
+            .pp {
+                margin-left: 10px;
+                border-bottom: 1px solid var(--primary-color); /* Change color as needed */
+                width: 200px;
+            }
+
+            .about-text {
+                margin-left: 10px;
+            }
+
+        </style>
+    </head>
+
+    <h1> About & Info</h1>
+
+    <h4 class="about-info-head">About Us</h4>
+    <br>
+    <p class="about-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sit amet sem ipsum. Curabitur mattis, quam sed convallis eleifend, libero orci condimentum eros, nec rutrum ipsum orci nec nunc. Aenean dapibus fringilla neque eget vulputate. Aenean dignissim felis a mollis varius. Sed sed gravida justo. Aliquam ac volutpat dolor. Duis congue viverra lectus, a fermentum ipsum laoreet non. Nulla facilisi. Nulla dictum, dolor et venenatis mattis, diam orci ultricies risus, id pretium justo magna non tellus. Nam iaculis malesuada condimentum. Duis ut libero eget ante cursus sollicitudin. Integer in dolor eget est maximus accumsan. Curabitur sed risus in est accumsan ullamcorper. Suspendisse interdum, nisi et semper accumsan, felis nulla blandit nisi, sed viverra augue velit quis mi.
+        <a href="#" style="color: var(--secondary-color);">..more</a>
+    </p>
+    <br>
+    <h4 class="about-info-head ts">Terms of Service</h4>
+    <br>
+    <p class="about-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sit amet sem ipsum. Curabitur mattis, quam sed convallis eleifend, libero orci condimentum eros, nec rutrum ipsum orci nec nunc. Aenean dapibus fringilla neque eget vulputate. Aenean dignissim felis a mollis varius. Sed sed gravida justo. Aliquam ac volutpat dolor. Duis congue viverra lectus, a fermentum ipsum laoreet non. Nulla facilisi. Nulla dictum, dolor et venenatis mattis, diam orci ultricies risus, id pretium justo magna non tellus. Nam iaculis malesuada condimentum. Duis ut libero eget ante cursus sollicitudin. Integer in dolor eget est maximus accumsan. Curabitur sed risus in est accumsan ullamcorper. Suspendisse interdum, nisi et semper accumsan, felis nulla blandit nisi, sed viverra augue velit quis mi.
+        <a href="#" style="color: var(--secondary-color);">..more</a>
+    </p>
+    <br>
+    <h4 class="about-info-head pp"> Privacy Policy </h4>
+    <br>
+    <p class="about-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sit amet sem ipsum. Curabitur mattis, quam sed convallis eleifend, libero orci condimentum eros, nec rutrum ipsum orci nec nunc. Aenean dapibus fringilla neque eget vulputate. Aenean dignissim felis a mollis varius. Sed sed gravida justo. Aliquam ac volutpat dolor. Duis congue viverra lectus, a fermentum ipsum laoreet non. Nulla facilisi. Nulla dictum, dolor et venenatis mattis, diam orci ultricies risus, id pretium justo magna non tellus. Nam iaculis malesuada condimentum. Duis ut libero eget ante cursus sollicitudin. Integer in dolor eget est maximus accumsan. Curabitur sed risus in est accumsan ullamcorper. Suspendisse interdum, nisi et semper accumsan, felis nulla blandit nisi, sed viverra augue velit quis mi.
+        <a href="#" style="color: var(--secondary-color);">..more</a>
+    </p>
+
+{% endblock %}
+

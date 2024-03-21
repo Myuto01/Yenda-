@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Yenda| Change Profile Picture{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}"> 
+    <link rel="icon" href="{% static 'images/logo.png' %}" type="image/x-icon">
+
+    <style>
+        .account-details-container{
+            display: flex;
+            flex-direction:column;
+            margin-top: 50px; 
+            text-align: center;
+            margin-left: 0;
+            gap: 0;
+            border-radius: 10px;
+            padding: 20px 20px;
+            border-bottom: 1px solid var(--primary-color);
+
+        }
+
+        .user-name-label,
+        .user-email-label {
+            color: black;
+            font-weight: bold;
+        }
+
+        .user-name,
+        .user-email {
+            margin-left: 10px;
+            font-weight: lighter;
+        }
+
+        .account-details-btn-container{
+            margin-left: 10px;
+            width: 100px;
+        }
+
+        .change-name-container {
+            border: 1px solid black;
+            border-radius: 10px;
+            width: 300px;
+            height: 60px;
+            margin-top: 5px;
+        }
+
+        .change-name {
+            margin-top: 5px;
+            margin-left: 5px;
+        }
+
+        .sub-text {
+            font-size: 13px;
+            font-weight: lighter;
+            margin-left: 30px;
+         }/* When I hover on this text I want it to appear and should have a transition */
+
+        .fas {
+            margin-top: 10px;
+        }
+
+        a {
+            color: black;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+
+        
+        .fa-angle-right {
+            left: 275px;
+            position: relative;
+            bottom: 61px;
+        }
+
+     
+
+        .cover-image {
+            position: relative;
+            width: 100%; /* Adjust the width to match the desired size */
+            height: 200px; /* Adjust the height of the cover image */
+            background-color: var(--primary-color); /* Set the background color to red */
+        }
+
+
+        .cover-image img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .avatar-fallback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 10px solid white; /* Add a border to the profile picture */
+            border-radius: 50%;
+        }
+
+        .avatar-fallback img {
+            width: 150px; /* Adjust the size of the profile picture */
+            height: 150px; /* Adjust the size of the profile picture */
+            border-radius: 50%;
+        }
+
+        .avatar-fallback:hover + .change-profile-link {
+            display: block;
+        }
+
+        .change-profile-link {
+            display: none;
+        }
+
+      
+    </style>
+</head>
+
+<body>
+    <div class="cover-image">
+      
+        {% if request.user.profile_pic %}
+        <div class="avatar-fallback">
+            <img src="{{ request.user.profile_pic.url }}" class="rounded-circle" alt="Avatar" />
+        </div>
+        {% else %}
+            <div class="avatar-fallback">
+                <!-- Default profile picture -->
+                <img src="{% static 'images/logo.png' %}" class="rounded-circle" alt="Default Avatar" />
+            </div>
+        {% endif %}
+    </div>
+    
+    <div class="account-details-container">
+        <!--Change Profile Picture-->
+        <a href="{% url 'app:change-profile_pic' %}" style="font-size: 15px;">Change Profile Picture</a>
+        <!-- User Name -->
+        <p class="user-name-label"><span class="user-name" style="font-size: 50px; font-weight: bold;">{{ request.user }}</span></p>
+        <!-- User Email -->
+        <p class="user-email-label"><span class="user-email" style="color: rgb(184, 178, 178);">{{ request.user.email }}</span></p>
+    </div>
+    <br><br>
+
+    
+    <div class="account-details-btn-container">
+        <a href="{% url 'app:change-name' %}"><div class="change-name-container">
+            <div class="change-name">
+                <i class="fas fa-pencil-alt fa-user-edit"></i>
+                Change Name
+            </div>
+            <p class="sub-text">lores ipsum emporium</p>
+            <i class="fas fa-angle-right"></i>
+        </div></a>
+
+        <a href="#"><div class="change-name-container">
+            <div class="change-name">
+                <i class="fas fa-edit fa-number-change"></i>
+                Change Number 
+                <p class="sub-text">lores ipsum emporium</p>
+            </div>
+            <i class="fas fa-angle-right"></i>
+        </div></a>
+
+        <a href="#"><div class="change-name-container">
+            <div class="change-name">
+                <i class="fas fa-lock fa-password-change"></i>
+                Change Password
+               
+            </div>
+            <p class="sub-text">lores ipsum emporium</p>
+            <i class="fas fa-angle-right"></i>
+        </div></a>
+
+        <a href="#"><div class="change-name-container">
+            <div class="change-name">
+                <i class="fas fa-user-slash fa-account-deactivate"></i>
+                Deactivate Account
+                
+            </div>
+            <p class="sub-text">lores ipsum emporium</p>
+            <i class="fas fa-angle-right"></i>
+        </div></a>
+    </div>
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,277 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!----===== Iconscout CSS ===== -->
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>{% block title %}Yenda{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static '/css/Operator_dashboard.css' %}">
+    <style>
+      
+    </style>
+</head>
+
+<body>
+  {% for message in messages %}
+  <div class="alert alert-{{ message.tags }}">
+      {{ message }}
+  </div>
+  {% endfor %}
+ 
+    <nav>
+        <div class="logo-name">
+            <div class="logo-image">
+                <img src="{% static 'images/logo.png' %}" alt="">
+            </div>
+
+            <span class="logo_name">Yenda</span>
+        </div>
+
+        <div class="menu-items" style="overflow-y: scroll;">
+           
+            <ul class="nav-links">
+                <li><a href="#">
+                    <i class="uil uil-estate"></i>
+                    <span class="link-name">Dashboard</span>
+                </a></li>
+                <li><a href="#">
+                    <i class="uil uil-clock"></i>
+                    <span class="link-name">Trip Schedule</span>
+                </a></li>
+                <li><a href="#">
+                    <i class="uil uil-bus-alt"></i>
+                    <span class="link-name">Buses</span>
+                </a></li>
+                <li><a href="#">
+                    <i class="fa fa-id-card-o" aria-hidden="true"></i>
+                    <span class="link-name">Drivers</span>
+                </a></li>
+                <li><a href="#">
+                    <i class="fa fa-ticket" aria-hidden="true"></i>
+                    <span class="link-name">Orders</span>
+                </a></li>
+                             
+                <li><a href="#">
+                    <i class="uil uil-chart"></i>
+                    <span class="link-name">Analytics</span>
+                </a></li>
+
+                <li><a href="#">
+                    <i class="fa fa-comments-o" aria-hidden="true"></i>
+                    <span class="link-name">Messages</span>
+                </a></li>
+            </ul>
+
+            <div class="dropdown-divider"></div>
+            <ul>
+                <li><a href="#">
+                    <i class="fa fa-cog" aria-hidden="true"></i>
+                    <span class="link-name">Settings</span>
+                </a></li>
+
+                <li><a href="#">
+                    <i class="fa fa-question-circle" aria-hidden="true"></i>
+                    <span class="link-name">Help and Support</span>
+                </a></li>
+            </ul>
+            <ul class="logout-mode">
+                <li>
+                    <a href="{% url 'app:logout' %}">
+                        <i class="uil uil-signout"></i>
+                        <span class="link-name">Logout</span>
+                    </a>
+                </li>
+
+                <li class="mode">
+                    <a href="#">
+                        <i class="uil uil-moon"></i>
+                    <span class="link-name">Dark Mode</span>
+                </a>
+
+                <div class="mode-toggle">
+                  <span class="switch"></span>
+                </div>
+            </li>
+            </ul>
+        </div>
+        
+    </nav>
+    
+    <section class="dashboard">
+       
+        <div class="top">
+            <i class="uil uil-bars sidebar-toggle"></i>
+            
+            <i class="fa fa-bell-o" aria-hidden="true"></i>
+
+            <div class="search-box">
+                <i class="uil uil-search"></i>
+                <input type="text" placeholder="Search here...">
+            </div>
+           
+            
+            
+            <!--<img src="images/profile.jpg" alt="">-->
+            <span id="datetime" style=" display: block; position: relative;
+            z-index: 10;margin-top: 90px; right: 86%"></span>
+        </div>
+        <br><br>
+        
+        {% block content %}{% endblock %}
+    </section>
+
+   
+
+
+
+   
+
+    
+ <!-- Popper.js -->
+ <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" ></script>
+
+ <!-- Bootstrap JS -->
+ <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" ></script>
+ <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+ </body>
+<script >
+    const body = document.querySelector("body"),
+    modeToggle = body.querySelector(".mode-toggle");
+    sidebar = body.querySelector("nav");
+    sidebarToggle = body.querySelector(".sidebar-toggle");
+  
+  let getMode = localStorage.getItem("mode");
+  if(getMode && getMode ==="dark"){
+  body.classList.toggle("dark");
+  }
+  
+  let getStatus = localStorage.getItem("status");
+  if(getStatus && getStatus ==="close"){
+  sidebar.classList.toggle("close");
+  }
+  
+  modeToggle.addEventListener("click", () =>{
+  body.classList.toggle("dark");
+  if(body.classList.contains("dark")){
+      localStorage.setItem("mode", "dark");
+  }else{
+      localStorage.setItem("mode", "light");
+  }
+  });
+  
+  sidebarToggle.addEventListener("click", () => {
+  sidebar.classList.toggle("close");
+  if(sidebar.classList.contains("close")){
+      localStorage.setItem("status", "close");
+  }else{
+      localStorage.setItem("status", "open");
+  }
+  })
+  
+  
+  // Carousel JavaScript
+  const wrapper = document.querySelector(".wrapper");
+  const carousel = document.querySelector(".carousel");
+  const firstCardWidth = carousel.querySelector(".card").offsetWidth;
+  const arrowBtns = document.querySelectorAll(".wrapper i");
+  const carouselChildrens = [...carousel.children];
+  
+  let isDragging = false, isAutoPlay = true, startX, startScrollLeft, timeoutId;
+  
+  // Get the number of cards that can fit in the carousel at once
+  let cardPerView = Math.round(carousel.offsetWidth / firstCardWidth);
+  
+  // Insert copies of the last few cards to beginning of carousel for infinite scrolling
+  carouselChildrens.slice(-cardPerView).reverse().forEach(card => {
+  carousel.insertAdjacentHTML("afterbegin", card.outerHTML);
+  });
+  
+  // Insert copies of the first few cards to end of carousel for infinite scrolling
+  carouselChildrens.slice(0, cardPerView).forEach(card => {
+  carousel.insertAdjacentHTML("beforeend", card.outerHTML);
+  });
+  
+  // Scroll the carousel at appropriate postition to hide first few duplicate cards on Firefox
+  carousel.classList.add("no-transition");
+  carousel.scrollLeft = carousel.offsetWidth;
+  carousel.classList.remove("no-transition");
+  
+  // Add event listeners for the arrow buttons to scroll the carousel left and right
+  arrowBtns.forEach(btn => {
+  btn.addEventListener("click", () => {
+      carousel.scrollLeft += btn.id == "left" ? -firstCardWidth : firstCardWidth;
+  });
+  });
+  
+  const dragStart = (e) => {
+  isDragging = true;
+  carousel.classList.add("dragging");
+  // Records the initial cursor and scroll position of the carousel
+  startX = e.pageX;
+  startScrollLeft = carousel.scrollLeft;
+  }
+  
+  const dragging = (e) => {
+  if(!isDragging) return; // if isDragging is false return from here
+  // Updates the scroll position of the carousel based on the cursor movement
+  carousel.scrollLeft = startScrollLeft - (e.pageX - startX);
+  }
+  
+  const dragStop = () => {
+  isDragging = false;
+  carousel.classList.remove("dragging");
+  }
+  
+  const infiniteScroll = () => {
+  // If the carousel is at the beginning, scroll to the end
+  if(carousel.scrollLeft === 0) {
+      carousel.classList.add("no-transition");
+      carousel.scrollLeft = carousel.scrollWidth - (2 * carousel.offsetWidth);
+      carousel.classList.remove("no-transition");
+  }
+  // If the carousel is at the end, scroll to the beginning
+  else if(Math.ceil(carousel.scrollLeft) === carousel.scrollWidth - carousel.offsetWidth) {
+      carousel.classList.add("no-transition");
+      carousel.scrollLeft = carousel.offsetWidth;
+      carousel.classList.remove("no-transition");
+  }
+  
+  // Clear existing timeout & start autoplay if mouse is not hovering over carousel
+  clearTimeout(timeoutId);
+  if(!wrapper.matches(":hover")) autoPlay();
+  }
+  
+  const autoPlay = () => {
+  if(window.innerWidth < 800 || !isAutoPlay) return; // Return if window is smaller than 800 or isAutoPlay is false
+  // Autoplay the carousel after every 2500 ms
+  timeoutId = setTimeout(() => carousel.scrollLeft += firstCardWidth, 2500);
+  }
+  autoPlay();
+  
+  carousel.addEventListener("mousedown", dragStart);
+  carousel.addEventListener("mousemove", dragging);
+  document.addEventListener("mouseup", dragStop);
+  carousel.addEventListener("scroll", infiniteScroll);
+  wrapper.addEventListener("mouseenter", () => clearTimeout(timeoutId));
+  wrapper.addEventListener("mouseleave", autoPlay);
+  
+  function updateDateTime() {
+            var now = new Date();
+            var datetimeElement = document.getElementById('datetime');
+            datetimeElement.innerHTML = 'Current Date and Time: ' + now.toLocaleString();
+        }
+
+        // Call updateDateTime() initially to display the date and time immediately
+        updateDateTime();
+
+        // Call updateDateTime() every second to update the displayed date and time
+        setInterval(updateDateTime, 1000);
+  </script>
+  </html>

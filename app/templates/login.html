@@ -1,0 +1,66 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+    <style>
+        /* Your additional styling goes here */
+        .left {
+            background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5)),
+                url('{% static "images/bg1.jpg" %}');
+            background-size: cover;
+        }
+        .far {
+            position: absolute;
+            top: 457px;
+            right: 60px;
+        }
+      
+    </style>
+</head>
+<body>
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    <div class="split-screen">
+        <div class="left">
+            <section class="copy ">
+                <h1 style="color: white; font-size: 100px">Yenda</h1>
+                <p>Book Your Next Ticket</p>
+            </section>
+        </div>
+        <div class="right">
+            <form method="post" action="{% url 'app:login' %}">
+                {% csrf_token %}
+                <section class="copy">
+                    <h2>Login</h2>
+                    <div class="login-container">
+                        <p>Don't have an account? <a href="{% url 'app:register-user' %}"><strong>Sign Up</strong></a></p>
+                    </div>
+                </section>
+                <!-- Your form fields go here -->
+                <div class="input-container username">
+                    <label for="id_username">Username</label>
+                    <input id="id_username" name="username" type="text" required>
+                </div>
+                <div class="input-container password">
+                    <label for="id_password">Password</label>
+                    <input id="id_password" name="password" type="password" required>
+                    <i class="far fa-eye-slash"></i>
+                </div>
+                <button class="signup-btn" type="submit">Login</button>
+                <p style="text-align: center;">Forgot password? <a href="{% url 'app:reset_password' %}">Reset password</a></p>
+                <section class="copy legal">
+                    <!-- ... (existing fields) ... -->
+                </section>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

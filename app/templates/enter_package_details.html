@@ -1,0 +1,302 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Yenda| Enter Package Details{% endblock %}</title> 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+    .header-container {
+        background: rgb(219, 218, 218);
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .header-container .date {
+        font-weight: bold;
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .header-container .result-container {
+        font-size: 15px;
+    }
+
+    .header-container .result-container .result-text {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .header-container .result-container .result-text .fa {
+            font-weight: lighter;
+    }
+
+    .header-title {
+        text-align: center;
+    }
+
+    .package-details-form {
+        background-color: rgb(230, 228, 228);
+        margin: auto;
+        width: 100%;
+        height: 100%;
+        border-radius: 20px;
+    }
+
+    #confirm-pkg-btn {
+        border-radius: 20px;
+        margin-left: 900px;
+        margin-bottom: 20px;
+        width: 200px;
+        padding: 10px 20px;
+        background-color: var(--primary-color);
+        color: var(--border-color);
+        cursor: pointer;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    #confirm-pkg-btn:hover {
+        background-color: var(--primary-color);
+        color: var(--text-color);
+       
+    }
+
+    label {
+        color: var(--primary-color);
+        margin-left: 10px;
+    }
+
+    .item-name {
+        border-radius: 5px;
+        width: 450px;
+        height: 30px;
+        margin-left: 20px;
+        margin-bottom: 10px;
+    }
+
+    .item-name-l,
+    .item-name-w,
+    .item-name-h {
+        height: 30px;
+        width: 250px;
+    }
+
+    .description-input {
+        width: 450px;
+        margin-left: 20px;
+        margin-bottom: 10px;
+
+    }
+
+    ::-webkit-input-placeholder {
+        margin-left: 10px;
+    }
+
+    :-moz-placeholder {
+        margin-left: 10px;
+    }
+
+    .unit {
+        position: relative;
+        font-style: italic;
+        color: var(--text-color);
+        right: 30px;
+      
+    }
+
+    .item .lwh-container {
+        display: flex;
+        flex-direction: row;
+        margin-top: 50px;
+        gap: 150px;
+    }
+
+    .weight-item-quantity-container {
+        display: flex;
+        flex-direction: row;
+        margin-top: 50px;
+        gap: 250px;
+    }
+
+    .fragile-category-container {
+        display: flex;
+        flex-direction: row;
+        margin-top: 50px;
+        gap: 568px;
+    }
+
+    .item-desc-btn {
+        display: flex;
+        flex-direction: row;
+        margin-top: 50px;
+        gap: 100px;
+    }
+
+    .unit-kg {
+        position: relative;
+        font-style: italic;
+        color: var(--text-color);
+        right: 30px;
+    }
+
+    @media (max-width: 780px) {
+        .item-name {
+            border-radius: 5px;
+            width: 330px;
+            height: 30px;
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .item .lwh-container {
+            display: flex;
+            flex-direction: column;
+            margin-top: 50px;
+            gap: 50px;
+        }
+
+        .weight-item-quantity-container {
+            display: flex;
+            flex-direction: column;
+            margin-top: 50px;
+            gap: 10px;
+        }
+
+        .fragile-category-container {
+            display: flex;
+            flex-direction: column;
+            margin-top: 50px;
+            gap: 50px;
+        }
+
+        .description-input {
+            width: 300px;
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        #confirm-pkg-btn {
+            margin-left: 80px;
+            margin-bottom: 20px;
+            width: 200px;
+        }
+
+        .unit-kg {
+            left: 89%;
+            bottom: 38px;
+        }
+
+
+    }
+    </style>
+</head>
+
+<body>
+
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <div class="header-container">
+        <div class="result-container">
+            <div class="result-text">
+                <span id="displayCurrentLocation"></span> <i class="fas fa-arrow-right"></i> <span id="displayDestination"></span>
+            </div>
+        </div> 
+    </div>
+    <h3 class="header-title"> Enter Package Details </h3>
+        <p style="text-align: center;"><strong>Note:</strong> Enter Correct/Estimated details for accurate pricing..</p>
+                    
+            <div class="package-details-form">
+                <form id="package-details-form" method="post" action="{% url 'app:enter-package-details' %}">
+                    {% csrf_token %}
+                    {{ form.errors }}
+                    <!-- Include hidden fields for currentLocation and destination -->
+                    <input type="hidden" name="current_location" id="currentLocationInput">
+                    <input type="hidden" name="destination" id="destinationInput">
+                        <br>
+
+                        <div class="item lwh-container">
+                            <label style="display: block; margin-bottom: 10px;" for="id_item_name">Item Name:</label>
+                            {{form.item_name}}
+
+                            <div class="lwh-container">
+                                <label style="display: block; margin-bottom: 10px;" for="id_length">Length: {{ form.length }}<span class="unit">cm</span></label>
+                                
+                            
+                                <label style="display: block; margin-bottom: 10px;" for="id_width">Width: {{ form.width }}<span class="unit">cm</span></label>
+                                
+                                <label style="display: block; margin-bottom: 10px;" for="id_height">Height: {{ form.height }}<span class="unit">cm</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="weight-item-quantity-container">
+                            <label style="display: block; margin-bottom: 10px;" for="id_weight">Weight:<br><br> {{ form.weight }}<span class="unit-kg">kg</span></label>
+                            
+                        
+                            <label style="display: block; margin-bottom: 10px;" for="id_item_quantity">Item Quantity:<br><br>  {{ form.item_quantity }}</label>
+                           
+                        </div>
+                        
+                        <div class="fragile-category-container">
+                            <label style="display: block; margin-bottom: 10px;" for="id_fragile_item">Fragile Item: {{ form.fragile_item }}</label>
+                             
+                            <label style="display: block; margin-bottom: 10px;" for="id_item_category">Item Category: <br><br> {{ form.item_category }}</label>
+
+                        </div>
+                        
+                       
+                        <label style="display: block; margin-top: 50px; margin-bottom: 10px;" for="id_item_description">Item Description:<br><br> {{ form.item_description }}</label>
+                        
+
+                        <button  type="submit" id="confirm-pkg-btn">Submit</button>
+                        
+             </div>
+            
+        </form>
+    </div>
+    
+
+
+    <script>
+        // Retrieve values from localStorage
+        var currentLocation = localStorage.getItem('currentLocation');
+        var destination = localStorage.getItem('destination');
+       
+
+        // Display values in the designated spans
+        document.getElementById('displayCurrentLocation').innerText = currentLocation;
+        document.getElementById('displayDestination').innerText = destination;
+
+        // Set values of hidden input fields
+        document.getElementById('currentLocationInput').value = currentLocation;
+        document.getElementById('destinationInput').value = destination
+    </script>
+
+    
+    <!-- JavaScript to handle Enter key press -->
+    <script>
+        // Function to show confirm dialog when "Submit" button is clicked
+        document.getElementById('confirm-pkg-btn').addEventListener('click', function(event) {
+            event.preventDefault();
+            if (confirm('Enter correct/Estimated details for accurate pricing..')) {
+                document.getElementById('package-details-form').submit();
+            }
+        });
+    </script>
+    
+
+</body>
+</html>
+{% endblock %}

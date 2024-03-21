@@ -1,0 +1,247 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Messages</title>
+  <style>
+    /* Global Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h1 {
+      text-align: center;
+      padding: 20px;
+      margin-bottom: 0;
+    }
+
+    /* Message Container */
+    .message-container {
+      flex: 1;
+      overflow-y: scroll;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Individual Messages */
+    .message {
+      display: flex; /* Allow stacking of avatar and message content */
+      align-items: flex-start; /* Align message content vertically */
+      max-width: 70%;
+      border-radius: 10px;
+      padding: 10px;
+      word-wrap: break-word;
+      margin-bottom: 10px; /* Consistent margin for better flow */
+    }
+
+    .sender-message {
+      background-color: #DCF8C6; /* Customize with your desired background color */
+      align-self: flex-end;
+    }
+
+    .receiver-message {
+      background-color: #E5E5EA; /* Customize with your desired background color */
+      align-self: flex-start;
+    }
+
+    /* Message Content */
+    .message-content {
+      margin-left: 55px; /* Adjust margin based on avatar size */
+      flex: 1; /* Allow message content to fill remaining space */
+    }
+
+    .message-header {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .message-timestamp {
+      font-size: 0.8rem; /* Adjust font size as needed */
+      color: #999; /* Grayish color for timestamps */
+      text-align: right; /* For sender messages */
+      align-self: flex-end; /* Align timestamps within messages */
+    }
+
+    /* Avatar */
+    .avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      margin-right: 10px; /* Adjust margin as needed */
+    }
+
+    /* Messaging Form */
+    .message-form {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+    }
+
+    .message-input {
+      width: 80%;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      outline: none;
+      margin-right: 10px;
+      font-size: 1rem; /* Adjust font size as needed */
+    }
+
+    .send-button {
+      padding: 10px 20px;
+      border-radius: 20px;
+      background-color: #007bff; /* Customize with your desired background color */
+      color: white;
+      border: none;
+      cursor: pointer;
+      outline: none;
+      font-size: 1rem; /* Adjust font size as needed */
+    }
+
+    @media (max-width: 780px) {
+      .message {
+        /* Adjust margins for smaller screens */
+        margin-bottom: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Messages</h1>
+
+  <div class="message-container" id="message-container">
+    {% for message in messages|dictsort:"timestamp" %}
+      {% if message.sender == user %}
+        <div class="message sender-message">
+          <img src="{% static 'images/logo.png' %}" alt="Sender avatar" class="avatar">
+          <div class="message-content">
+            <p class="message-content" id="chat-log">{{ message.content }}</p>
+            {% if message.sender == user %}
+                <p class="message-timestamp">
+                    {{ message.created_at|timesince }}
+                </p>
+            {% endif %}
+          </div>
+        </div>
+      {% else %}
+        <div class="message receiver-message">
+          <img src="{% static 'images/logo.png' %}" alt="Recipient avatar" class="avatar">
+          <div class="message-content">
+            <p class="message-header">{{ message.sender.username }}</p>
+            <p class="message-content" id="chat-log">{{ message.content }}</p>
+            {% if message.sender == user %}
+                <p class="message-timestamp">
+                    {{ message.created_at|timesince }}
+                </p>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+    <form method="post" id="message-form" class="message-form" data-sender-id="{{ sender.id }}">
+        {% csrf_token %}
+        <input type="text" name="content" id="message-input" class="message-input" placeholder="Type your message...">
+        <input type="hidden" name="original_sender_id" value="{{ sender.id }}">
+        <button type="submit" class="send-button" id="message-submit">Send</button>
+    </form>
+
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="{% static 'channels/static/js/channels.js' %}"></script> 
+
+  <script>
+    // Function to check if a request is a safe method (e.g., GET, HEAD, OPTIONS)
+    function csrfSafeMethod(method) {
+      // These HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+  
+    $(document).ready(function() {
+
+        const csrfToken = document.querySelector('#message-form input[name="csrfmiddlewaretoken"]').value;
+
+        // Existing message container scrolling logic
+
+        var senderId = $('#message-form').data('sender-id'); // Retrieve sender ID from HTML attribute
+
+        var ws = new WebSocket(`ws://${window.location.host}/ws/chat/${senderId}/`);
+
+        ws.onmessage = function(event, user) {
+        var data = JSON.parse(event.data);
+
+        // Create the HTML for the new message using template literals
+        const newMessageHtml = `
+            <div class="message ${data.sender === user ? 'sender-message' : 'receiver-message'}">
+            <img src="{% static 'images/logo.png' %}" alt="Sender avatar" class="avatar">
+            <div class="message-content">
+                <p class="message-content">${data.message}</p>
+                <p class="message-timestamp">${data.timestamp}</p>
+            </div>
+            </div>
+        `;
+
+        // Append the new message HTML to the message container
+        $('#message-container').append(newMessageHtml);
+
+
+        // Scroll to the bottom
+        $('#message-container').scrollTop($('#message-container')[0].scrollHeight);
+        };
+
+
+
+
+        ws.onclose = function(event) {
+            console.error('WebSocket connection closed');
+        };
+
+        $('#message-form').on('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            var message = $('#message-input').val();
+            const timestamp = new Date().toISOString(); // Get current time in ISO format
+
+            ws.send(JSON.stringify({
+                message: message,
+                timestamp: timestamp,
+                csrfmiddlewaretoken: '{{ csrf_token }}', // Include the CSRF token in the message
+
+            }));
+
+            // Clear the message input
+            $('#message-input').val('');
+
+            // Scroll to the bottom
+            $('#message-container').scrollTop($('#message-container')[0].scrollHeight);
+        });
+    });
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+</script>
+
+  
+</body>
+</html>

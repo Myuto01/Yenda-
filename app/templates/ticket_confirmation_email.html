@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Confirmation</title>
+    <style>
+        /* Basic Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px; /* Adjust width as needed */
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border: 3px solid #000;
+            border-radius: 10px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1848a0;
+        }
+
+        p {
+            margin: 0;
+            color: #000;
+        }
+
+        /* Additional Styles */
+        .ticket-details {
+            margin-bottom: 20px;
+        }
+
+        .ticket-details strong {
+            color: #1848a0;
+            font-weight: bold;
+        }
+
+        .ticket-logo img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 20px;
+        }
+
+        .qrcode {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .qrcode img {
+            max-width: 200px; /* Adjust size as needed */
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+{% for ticket in tickets %}
+    <div class="container">
+        <h1>Ticket</h1>
+    
+        <div class="ticket-details">
+            <div class="ticket-logo"><img src="logo.png" alt="Logo"></div>
+            <div class="bus-operator-ticket">
+                <p><strong>Bus Operator:</strong><br>{{ ticket.bus_operator }}</p>
+                <p><strong>Ticket ID:</strong><br> {{ ticket.id }}</p>
+            </div>
+            <p><strong>Passenger Name:</strong><br> {{ ticket.passenger_name}}</p>
+            <div class="trip-origin-destination-container">
+                <p><strong>Origin:</strong><br> {{ ticket.origin}}</p>
+                <span>&#128652;</span>
+                <p><strong>Destination:</strong><br> {{ ticket.destination}}</p>
+            </div>
+            <div class="trip-time-container">
+                <p><strong>Trip Date:</strong><br> <strong> {{ ticket.departure_date}} </strong> </p>
+                <p><strong>Departure Time:</strong><br><strong>  {{ ticket.departure_time }} </strong></p>
+            </div>
+        </div>
+        <div class="qrcode">
+            {% if ticket.qr_code %}
+                <img src="{{ ticket.qr_code.url }}" alt="QR Code">
+            {% endif %}
+        </div>
+    </div>
+{% endfor %}
+</body>
+</html>
+

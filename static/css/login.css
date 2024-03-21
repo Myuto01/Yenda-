@@ -1,0 +1,262 @@
+:root {
+    /* ===== Colors ===== */
+    --primary-color: rgb(48, 150, 218);
+    --panel-color: #FFF;
+    --text-color: #000;
+    --secondary-color:  rgb(173,232,244);
+    --black-light-color: #707070;
+    --border-color: white;
+    --toggle-color: #DDD;
+    --box1-color: #005b96;
+    --box2-color: rgb(10, 197, 197);
+    --box3-color: rgb(174, 247, 247);
+    --title-icon-color: #fff;
+    --button: rgb(10, 197, 197);
+    --button-hover: rgb(174, 247, 247); 
+
+/* ====== Transition ====== */
+--tran-05: all 0.5s ease;
+--tran-03: all 0.3s ease;
+--tran-03: all 0.2s ease;
+}  
+
+body{
+    padding: 0;
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 300;
+}
+
+h1{
+    font-size: 2.25rem;
+    font-weight: 700;
+}
+
+h2 {
+    font-size:1.5rem;
+    font-weight: 700;
+}
+
+a {
+    text-decoration: none;
+    color: var(--primary-color);
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.small {
+    font-size: 80%;
+    text-align: center;
+}
+   
+.split-screen {
+    display: flex;
+    flex-direction: column;
+}
+
+.left {
+    height: 200px;
+}
+
+.left, .right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.left .copy {
+    color: white;
+    text-align: center;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.left p{
+    font-weight: 400;
+}
+
+.right .copy {
+    color: black;
+    text-align: center;
+}
+
+.right .copy p {
+    margin: 1.5rem 0;
+    font-size: 0.875rem;
+}
+
+.right form{
+    width: 328px;
+}
+
+form input[type="text"],
+form input[type="email"],
+form input[type="password"] {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    border-radius: 8px;
+    border: 1px solid #c4c4c4;
+    padding: 1em;
+    margin-bottom: 1.25rem;
+    font-size: 0.875rem;
+}
+
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+}
+
+.far {
+    position: absolute;
+    top: 734px;
+    right: 60px;
+}
+
+
+
+.checkbox-container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+}
+
+.checkbox-container {
+    display: block;
+    position: relative;
+    padding-left: 2rem;
+    cursor: pointer; 
+    user-select: none;
+    margin: 0 0 1.25rem 0;
+}
+
+.checkbox-container input:checked-.checkmark {
+    background-color: var(--primary-blue);
+    border: 1px solid var(--primary-blue);
+}
+
+.checkmark {
+    position: absolute;
+    width: 24px; 
+    height: 24px;
+    background: white;
+    border: 1px solid #c4c4c4;
+    border-radius: 2px;
+    top: -4px;
+    left: 0;
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.checkbox-container input:checked-.checkmark:after{
+    display: block;
+}
+
+.checkbox-container .checkmark:after{
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    width: 5px;
+    height:10px;
+    left: 8px;
+    top: 4px;
+    transform: rotate(45deg);
+}
+
+.signup-btn{
+    display: block;
+    width: 100%;
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 700;
+    border: none;
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.signup-btn:hover{
+    background: var(--secondary-color);
+    cursor: pointer;
+}
+
+@media screen and (min-width: 900px) {
+    .split-screen{
+        flex-direction: row;
+        
+    }
+    .left,
+    .right{
+        display: flex;
+        width: 50%;
+        height: auto;
+    }
+    .right form{
+    width: 328px;
+    
+}
+
+.left {
+    height: 1000px;
+}
+}
+
+.dynamic-txts {
+    background: black;
+    overflow: hidden;
+    line-height: 90px;
+    height: 90px;
+}
+
+.dynamic-txts ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.dynamic-txts li {
+    color: white;
+    position: relative;
+    top: 0;
+    animation: slide 6s steps(4) infinite;
+}
+
+@keyframes slide {
+    100% {
+        top: -360px;
+    }
+}
+
+.dynamic-txts li span {
+    position: relative;
+    display: inline-block;
+}
+
+.dynamic-txts li span:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: black;
+    border-left: 2px solid blue;
+    animation: typing 1.5s steps(10) infinite;
+}
+
+@keyframes typing {
+    100% {
+        left: 100%;
+        margin: 0 -33px 0 35px;
+    }
+}
+

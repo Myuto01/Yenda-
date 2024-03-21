@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Yenda| Fulfilled Receipts{% endblock %}</title>
+    <style>
+       li{
+            list-style: none;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: center; /* Center items horizontally */
+        }
+
+        .ticket {
+            position: relative;
+            width: 700px; /* Adjust width as needed */
+            padding: 20px;
+            background-color: #fff;
+            border: 3px dotted #000;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            background-color: blueviolet;
+            color: #fff;
+        
+        }
+
+        .qrcode-container{
+            display: flex;
+            position: relative;
+            width: 700px; /* Adjust width as needed */
+            padding: 20px;
+            background-color: #fff;
+            border: 3px dotted #000;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: blueviolet;
+            color: #fff;
+            justify-content: center;
+            margin: auto ;
+            bottom: 20px;
+        }
+
+     
+
+        .ticket:before,
+        .ticket:after {
+            content: '';
+            position: absolute;
+            top: 50%; /* Position at the vertical center */
+            width: 40px; /* Adjust size of circles */
+            height: 40px; /* Adjust size of circles */
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 50%; /* Make circles */
+            transform: translateY(-50%); /* Center vertically */
+        }
+
+        .ticket:before {
+            left: -22px; /* Adjust horizontal position */
+        }
+
+        .ticket:after {
+            right: -22px; /* Adjust horizontal position */
+        }
+
+        .ticket-content {
+            /* Adjust padding to accommodate the circles */
+            padding: 10px;
+        }
+
+        .trip-time-container{
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+
+        .trip-origin-destination-container{
+            display: flex;
+            flex-direction: row;
+            gap: 50px;
+        }
+
+        .sender-receiver-container{
+            display: flex;
+            flex-direction: row;
+            
+        }
+
+        .bus-operator-ticket{
+            display: flex;
+            flex-direction: row;
+            gap: 200px;
+        }
+
+        .ticket-logo img{
+            width: 50px;
+            height: 50px;
+            margin-bottom: 20px;
+        }
+    </style>
+
+</head>
+<body>
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    <h1>Fulfilled Receipts</h1>
+ 
+               <!-- <th>Sender Number</th>
+                <th>Receiver Name</th>
+                <th>Receiver Number</th> 
+            <td>{{ receipt.sender_number }}</td>
+                <td>{{ receipt.receiver_name }}</td>
+                <td></td>
+            -->
+    <ul>
+        {% for receipt in courier_receipts %}
+            <li>
+                <div class="container">
+                    <div class="ticket">
+                        <div class="ticket-content">
+                            <div class="ticket-logo"><img src="{% static 'images/logo.png' %}" alt="Logo"></div>
+                            <div class="bus-operator-ticket">
+                                <p><strong style="color: #000;">Courier:</strong> {{ receipt.courier }}</p>
+                                <p><strong style="color: #000;">Package ID:</strong>{{ receipt.package_id }}</p>
+                            </div>
+                            <div class="sender-receiver-container">
+                                <p><strong style="color: #000;">Sender Name:</strong>{{ receipt.sender_name }}</p>
+                                <p><strong style="color: #000;">Sender Number</strong>{{ receipt.sender_number }}</p>
+                             
+                                <p><strong style="color: #000;">Receiver Name:</strong>{{ receipt.receiver_name }}</p>
+                                <p><strong style="color: #000;">Receiver Number:</strong>{{ receipt.receiver_number }}</p>
+                            </div>
+                            
+                            <div class="trip-origin-destination-container">
+                                <p><strong style="color: #000;">Sender's Location:</strong> {{ current_location }}</p>
+                                <span>&#128652;</span>
+                                <p><strong style="color: #000;">Receiver's Location:</strong> {{ destination }}</p>
+                            </div><br>
+                            <div class="trip-time-container">
+                                <p><strong style="color: #000;">Amount(ZMK):</strong>{{ receipt.amount }}</p>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="qrcode-container">
+                    {% if receipt.qr_code %}
+                        <img src="{{ receipt.qr_code.url }}" alt="QR Code">
+                    {% else %}
+                        No QR Code Available
+                    {% endif %}
+                </div>
+            </li>
+        {% endfor %}
+
+        
+    </ul>
+
+</body>
+</html>
+{% endblock %}

@@ -1,0 +1,51 @@
+<!-- confirm_reservation.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reservation Confirmation</title>
+    <!-- Add CSS styles or link to an external stylesheet if needed -->
+    <style>
+        .bus-seat-label {
+            /* Define your styles for booked, available, and selected seats */
+            width: 50px;
+            height: 50px;
+            border: 2px solid #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .bus-seat-label[data-is-available="true"] {
+            border-color: gray;
+        }
+
+        .bus-seat-label[data-is-available="false"] {
+            border-color: red;
+        }
+
+        .bus-seat-label[data-booked-by="{{ user.username }}"] {
+            background-color: red; /* Color for seats booked by the current user */
+        }
+    </style>
+</head>
+<body>
+    <h2>Reservation Confirmation</h2>
+    <p>Thank you, {{ user.first_name }}, for choosing our service!</p>
+
+    <!-- Display booked seats associated with the reservation if available -->
+    {% if reservation.seats.exists %}
+        <h3>Booked Seats</h3>
+        {% for seat in reservation.seats.all %}
+            <div class="bus-seat-container">
+                <label class="bus-seat-label" data-is-available="{{ seat.is_available }}" data-booked-by="{{ seat.booked_by.username }}">
+                    <span class="seat-number">{{ seat.seat_number }}</span>
+                </label>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Additional details or a summary of the reservation can be added here -->
+
+    <a href="#">Back to Home</a>
+</body>
+</html>

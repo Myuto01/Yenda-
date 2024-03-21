@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<title>{% block title %}Tickets{% endblock %}</title>
+<link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}"> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Success</title>
+    <style>
+        li{
+            list-style: none;
+        }
+        
+        .container {
+            display: flex;
+            justify-content: center; /* Center items horizontally */
+            margin-bottom: 0;
+        }
+
+        .ticket {
+            position: relative;
+            width: 700px; /* Adjust width as needed */
+            padding: 20px;
+            background-color: #fff;
+            border: 3px dotted #000;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            background-color: var(--secondary-color);
+            color: #fff;
+        }
+
+        .qrcode-container{
+            display: flex;
+            position: relative;
+            width: 700px; /* Adjust width as needed */
+            padding: 20px;
+            border: 3px dotted #000;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: var(--border-colorcd);
+            color: #fff;
+            justify-content: center;
+            margin: auto ;
+            bottom: 20px;
+        }
+
+     
+
+        .ticket:before,
+        .ticket:after {
+            content: '';
+            position: absolute;
+            top: 50%; /* Position at the vertical center */
+            width: 40px; /* Adjust size of circles */
+            height: 40px; /* Adjust size of circles */
+            background-color: #fff;
+            border: 2px solid #000;
+            border-radius: 50%; /* Make circles */
+            transform: translateY(-50%); /* Center vertically */
+        }
+
+        .ticket:before {
+            left: -22px; /* Adjust horizontal position */
+        }
+
+        .ticket:after {
+            right: -22px; /* Adjust horizontal position */
+        }
+
+        .ticket-content {
+            /* Adjust padding to accommodate the circles */
+            padding: 10px;
+        }
+
+        
+        .trip-time-container{
+            display: flex;
+            flex-direction: row;
+            gap: 200px;
+        }
+
+        .trip-origin-destination-container {
+            display: flex;
+            flex-direction: row;
+            gap: 200px;
+        }
+
+        .bus-operator-ticket{
+            display: flex;
+            flex-direction: row;
+            gap: 300px;
+        }
+
+        .ticket-logo img{
+            width: 50px;
+            height: 50px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 780px) {
+            .container {
+                position: relative;
+                display: flex;
+                flex-direction: row;
+                box-sizing: border-box;
+                border-radius: 8px;
+                margin-top: 20px;
+                gap: 50px;
+                right: 30px;
+                width: 370px;
+                height: auto;
+                margin: 0 auto;
+                margin-bottom: 0;
+            }
+
+            .ticket {
+                width: 370px;
+            }
+
+            .bus-operator-ticket {
+                        gap: 88px;
+                    }
+
+            .trip-origin-destination-container {
+                gap: 60px;
+            }
+
+            .trip-time-container {
+                gap: 47px;
+            }
+            
+            .qrcode-container {
+                width: 350px;
+                right: 20px;
+            }
+    }
+
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">All Ticket Information</h1>
+    <ul>
+        {% for ticket, ticket_number in ticket_data %}
+            <li>
+                <div class="container">
+                    <div class="ticket">
+                        <div class="ticket-content">
+                                <div class="ticket-logo"><img src="{% static 'images/logo.png' %}" alt="Logo"></div>
+                                <div class="bus-operator-ticket">
+                                    <p><strong style="color: #1848a0;  font-weight: bold ;">Bus Operator:</strong><span style="color: #000;"><br> {{ ticket.trip.bus_operator}}</span></p>
+                                    <p><strong style="color: #1848a0; font-weight: bold">Ticket ID:</strong><span style="color: #000;"><br> {{ ticket.id}}</span></p>
+                                </div>
+                               
+                                <p><strong style="color: #1848a0; font-weight: bold">Passenger Name:</strong><span style="color: #000;"><br> {{ ticket.passenger_name}}</span></p>
+                               
+                                <div class="trip-origin-destination-container">
+                                    <p><strong style="color: #1848a0; font-weight: bold">Origin:</strong><span style="color: #000;"><br> {{ ticket.trip.origin}}</span></p>
+                                    <span>&#128652;</span>
+                                    <p><strong style="color: #1848a0; font-weight: bold">Destination:</strong><span style="color: #000;"><br> {{ ticket.trip.destination}}</span></p>
+                                </div>
+                               <br>
+                                <div class="trip-time-container">
+                                    <p><strong style="color: #1848a0; font-weight: bold">Trip Date:</strong><span style="color: #000;"><br> {{ ticket.trip.departure_date}}</span> </p>
+                                    <p><strong style="color: #1848a0; font-weight: bold  ">Departure Time:</strong><span style="font-weight: bold; font-size: 20px; color: #000;"><br> {{ ticket.trip.departure_time }}</span></p>
+                                </div>
+                               
+                        </div>
+                    </div>
+                </div>
+                <div class="qrcode-container">
+                    {% if ticket.qr_code %}
+                    <!-- Debug output to inspect the generated URL -->
+                        <!-- Display QR code image -->
+                        <img src="{{ ticket.qr_code.url }}" alt="QR Code">
+                    {% endif %}
+                </div>
+            </li>
+        {% endfor %}
+
+        
+    </ul>
+      <!-- Display Total Price -->
+     
+</body>
+</html>
+{% endblock %}

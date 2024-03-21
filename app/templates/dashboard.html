@@ -1,0 +1,876 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<html>
+<head>
+    <title>{% block title %}Yenda| Home{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+    <style>
+      
+        .accordion-header {
+            background-color: #f0f0f0; /* Change background color */
+            color: #333; /* Change text color */
+            font-size: 18px; /* Change font size */
+            /* Add any other styles as needed */
+        }
+
+        .accordion-button:not(.collapsed) {
+            color: var( --box1-color);
+            background-color: rgb(230, 228, 228);
+            box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
+        }
+
+        .accordion-button:focus {
+            z-index: 3;
+            border-color: var(--primary-color);
+            outline: 0;
+            box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+        }
+
+        .accordion-button {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            color: #212529;
+            text-align: left;
+            background-color: rgb(230, 228, 228);
+            border: 0;
+            border-radius: 0;
+            overflow-anchor: none;
+            transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out,border-radius .15s ease;
+        }
+
+        .accordion-item:active {
+            background-color: rgb(230, 228, 228); /* Change background color */
+            /* Add any other styles as needed */
+        }
+
+        .accordion-item {
+            border: 1px solid #ddd; /* Change border color and width */
+            border-radius: 5px; /* Add border radius for rounded corners */
+            /* Add any other styles as needed */
+        }
+
+        .collapse:(.show) {
+        background: rgb(230, 228, 228);
+        }
+
+        
+
+        .FAQs {
+            background: rgb(230, 228, 228);
+        }
+
+        footer {
+            background: rgb(230, 228, 228);
+
+        }
+
+        .error-message {
+            color: red;
+        }
+
+
+        @media (max-width: 780px) {
+            .right-content {
+            width: 100%;
+            margin: auto;
+        }
+        }
+
+
+
+
+    </style>
+</head>
+<body>
+{% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+    </div>
+{% endfor %}
+<div class="grid-container">
+  <div class="left-content">
+        <h2>
+            {% if request.user.is_authenticated %}
+                <h2 class="hello-user">Hello {{ request.user.first_name }}!</h2>
+            {% else %}
+                <h2 class="hello-user">Hello there!</h2>
+            {% endif %}
+        </h2>
+        <p class="welcome-message">Where are you headed to?</p>
+        
+        <div class="container">
+            <button type="button" class="choice travel highlighted" >
+                <i class="fas fa-bus"></i>
+                Travel
+            </button>
+            
+            <button type="button" class="choice courier">
+                <i class="fas fa-truck"></i>
+                Courier
+            </button>
+            
+                       
+        </div>
+
+        <div class="destination-container">
+            <p class="header"><strong>Book a trip</strong></p>
+            <form method="post" action="{% url 'app:search' %}">
+                {% csrf_token %}
+                <!-- Display form errors -->
+                {% if form_errors_for_travel and not form_errors %}
+                    <!-- Display form errors for the search form -->
+                    <div class="errors">
+                        <ul>
+                            {% for field, errors in form_errors_for_travel.items %}
+                                {% for error in errors %}
+                                    {% if field == 'current_location' %}
+                                        <li class="error-message">Please provide your current location.</li>
+                                    {% elif field == 'destination' %}
+                                        <li class="error-message">Please provide your destination.</li>
+                                    {% elif field == 'date' %}
+                                        <li class="error-message">Please select a date.</li>
+                                    {% else %}
+                                        <li class="error-message">{{ field|title }}: {{ error }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            
+
+                <!-- Form -->
+                <form method="post" action="{% url 'app:search' %}">
+                    {% csrf_token %}
+                    <div class="search-containers">
+                        <label>From</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-map-marker-alt" style="color: var(--primary-color);"></i>
+                            <input type="text" name="current_location" id="currentLocationInput" list="currentLocationList">
+                        </div><br>
+                        <label>To</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-flag-checkered" style="color: var(--primary-color);"></i>
+                            <input type="text" name="destination" id="destinationInput" list="destinationList">
+                        </div><br>
+                        <label><i class="far fa-calendar-alt" style="color: var(--primary-color);"></i>Date</label>
+                        <input type="date" name="date" id="dateInput" value="{% now 'Y-m-d' %}" min="{% now 'Y-m-d' %}">
+                        <br>
+                        <button type="submit" id="findBus">Find Bus</button>
+                    </div>
+                    <datalist id="currentLocationList">
+                        <!-- Populate this datalist dynamically with Zambian cities -->
+                    </datalist>
+                    <datalist id="destinationList">
+                        <!-- Populate this datalist dynamically with Zambian cities -->
+                    </datalist>
+                </form>
+
+               
+            </div>
+        </div>
+
+    <div class="right-content">
+        <div class="popular-places-container">
+           <!--  <a href="{% url 'app:popular places' %}">-->
+
+            <button>
+                popular-places 
+                <i class="fas fa-angle-right ml-2 opacity-8"></i>
+            </button></a>
+        
+            <div id="imageContainer">
+                <!-- Add your image tags here -->
+                <div class="place-img" id="placeImg">
+                    <img class="scrollImage" src='{% static "images/Location pics/LSK NeW.png" %}' alt="Image 1">
+                </div>
+                
+                <div class="place-img"  id="placeImgChingola">
+                <img class="scrollImage" src='{% static "images/Location pics/Chingola NEW.png" %}' alt="Image 1">
+                </div>
+
+                <div class="place-img" id="placeImgKabwe">
+                    <img class="scrollImage" src='{% static "images/Location pics/Kabwe NEW.png" %}' alt="Image 1">
+                </div>
+
+                <div class="place-img" id="placeImgKitwe">
+                    <img class="scrollImage" src='{% static "images/Location pics/Kitwe NEW.png" %}' alt="Image 1">
+                </div>
+
+                <div class="place-img" id="placeImgLivingstone">
+                    <img class="scrollImage" src='{% static "images/Location pics/Livingstone NEW.png" %}' alt="Image 1">
+                </div>
+
+                <div class="place-img" id="placeImgNdola">
+                    <img class="scrollImage" src='{% static "images/Location pics/Ndola NEW.png" %}' alt="Image 1">
+                </div>   
+             </div>
+        </div>
+    </div>
+</div>
+
+<br><br><br>
+
+<section class="FAQs">
+    <h2 style="color: ;">FAQs related to Bus Tickets Booking</h2>
+    <div class="accordion" id="accordionExample">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    What are the advantages of purchasing a bus ticket with Yenda?
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample" style="background: var(--border-color);">
+                <div class="accordion-body">
+                <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Accordion Item #2 -->
+        <!-- Copy and paste this block for additional items -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Why book bus tickets online on Yenda?
+                </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample" style="background: var(--border-color);">
+                <div class="accordion-body">
+                <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Accordion Item #3 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    I've lost my ticket. What should I do now?
+                </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample" style="background: var(--border-color);">
+                <div class="accordion-body">
+                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Accordion Item #4 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFour">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                    Is it mandatory to take a printout of the ticket?
+                </button>
+            </h2>
+            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample" style="background: var(--border-color);">
+                <div class="accordion-body">
+                <strong>This is the fourth item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Accordion Item #5 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFive">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                    Can I change the date of my journey after I have booked my bus ticket?
+                </button>
+            </h2>
+            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#accordionExample" style="background: var(--border-color);">
+                <div class="accordion-body">
+                <strong>This is the fifth item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Accordion Item #6 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSix">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                    Can I cancel my bus ticket online?
+                </button>
+            </h2>
+            <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix" data-bs-parent="#accordionExample" style="background: var(--border-color);">
+                <div class="accordion-body">
+                <strong>This is the sixth item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Accordion Item #7 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingSeven">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                    What happens if the bus does not leave on time or is canceled?
+                </button>
+            </h2>
+            <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven" data-bs-parent="#accordionExample" style="background: var(--border-color);">
+                <div class="accordion-body">
+                <strong>This is the seventh item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Accordion Item #8 -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingEight">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+                    Does the owner of the credit card/debit card with which the bus ticket is purchased need to be one of the passengers?
+                </button>
+            </h2>
+            <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight" data-bs-parent="#accordionExample" style="background: var(--border-color);">
+                <div class="accordion-body">
+                <strong>This is the eighth item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</section>
+<br><br>
+<!-- Footer -->
+<footer class="text-center text-lg-start bg-body-tertiary text-muted">
+    <!-- Section: Social media -->
+    <section class="d-flex justify-content-center justify-content-lg-between p-4 border-bottom">
+      <!-- Left -->
+      <div class="me-5 d-none d-lg-block">
+        <span>Get connected with us on social networks:</span>
+      </div>
+      <!-- Left -->
+  
+      <!-- Right -->
+      <div>
+        <a href="" class="me-4 text-reset">
+          <i class="fab fa-facebook-f"></i>
+        </a>
+        <a href="" class="me-4 text-reset">
+          <i class="fab fa-twitter"></i>
+        </a>
+        <a href="" class="me-4 text-reset">
+          <i class="fab fa-google"></i>
+        </a>
+        <a href="" class="me-4 text-reset">
+          <i class="fab fa-instagram"></i>
+        </a>
+      </div>
+      <!-- Right -->
+    </section>
+    <!-- Section: Social media -->
+  
+    <!-- Section: Links  -->
+    <section class="">
+      <div class="container text-center text-md-start mt-5">
+        <!-- Grid row -->
+        <div class="row mt-3">
+          <!-- Grid column -->
+          <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mb-4">
+            <!-- Content -->
+            <h6 class="text-uppercase fw-bold mb-4">
+              <i class="fa fa-map-marker me-3"></i>YENDA
+            </h6>
+            <p>
+              Here you can use rows and columns to organize your footer content. Lorem ipsum
+              dolor sit amet, consectetur adipisicing elit.
+            </p>
+          </div>
+          <!-- Grid column -->
+  
+          <!-- Grid column -->
+          <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mb-4">
+            <!-- Links -->
+            <h6 class="text-uppercase fw-bold mb-4">
+              About YENDA
+            </h6>
+            <p>
+              <a href="#!" class="text-reset">About Us</a>
+            </p>
+            <p>
+              <a href="#!" class="text-reset">Contact Us</a>
+            </p>
+            <p>
+              <a href="#!" class="text-reset">Services</a>
+            </p>
+            <p>
+              <a href="#!" class="text-reset">FAQs</a>
+            </p>
+          </div>
+          <!-- Grid column -->
+  
+          <!-- Grid column -->
+          <div class="col-md-3 col-lg-2 col-xl-2 mx-auto mb-4">
+            <!-- Links -->
+            <h6 class="text-uppercase fw-bold mb-4">
+              Useful links
+            </h6>
+            <p>
+              <a href="#!" class="text-reset">T&C</a>
+            </p>
+            <p>
+              <a href="#!" class="text-reset">Privacy Policy</a>
+            </p>
+            <p>
+              <a href="#!" class="text-reset">Refunds & Reschedules</a>
+            </p>
+            <p>
+                <!--superuser_messages-->
+                <a href="#" class="text-reset">Customer Service</a>
+            </p>
+          </div>
+          <!-- Grid column -->
+  
+          <!-- Grid column -->
+          <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mb-md-0 mb-4">
+            <!-- Links -->
+            <h6 class="text-uppercase fw-bold mb-4">Contact</h6>
+            <p><i class="fas fa-home me-3"></i> Lusaka, Cairo Rd 10012, ZM</p>
+            <p>
+              <i class="fas fa-envelope me-3"></i>
+              info@YENDA.com
+            </p>
+            <p><i class="fas fa-phone me-3"></i> +260 770 546 347</p>
+            <p><i class="fas fa-print me-3"></i> + 01 234 567 89</p>
+          </div>
+          <!-- Grid column -->
+        </div>
+        <!-- Grid row -->
+      </div>
+    </section>
+    <!-- Section: Links  -->
+  
+    <!-- Copyright -->
+    <div class="text-center p-4" style="background-color: rgba(0, 0, 0, 0.05);">
+      © 2024 Copyright:
+      <a class="text-reset fw-bold" href="#">&copy; Yenda</a>
+    </div>
+    <!-- Copyright -->
+  </footer>
+  <!-- Footer -->
+
+<!-- Include jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+   $(document).ready(function() {
+
+    
+    // Example list of Zambian cities (replace with actual data)
+   const zambianCities = [
+    "Lusaka",
+    "Ndola",
+    "Kitwe",
+    "Kabwe",
+    "Chingola",
+    "Mufulira",
+    "Livingstone",
+    "Luanshya",
+    "Kasama",
+    "Chipata",
+    "Solwezi",
+    "Mongu",
+    "Choma",
+    "Mansa",
+    "Mpika",
+    "Sesheke",
+    "Kalulushi",
+    "Kafue",
+    "Mazabuka",
+    "Kapiri Mposhi",
+    "Mwinilunga",
+    "Samfya",
+    "Chililabombwe",
+    "Mbala",
+    "Kawambwa",
+    "Chinsali",
+    "Mumbwa",
+    "Isoka",
+    "Mkushi",
+    "Siavonga",
+    "Petauke",
+    "Kalabo",
+    "Senanga",
+    "Chongwe",
+    "Kataba",
+    "Namwala",
+    "Chamfumbu",
+    "Mporokoso",
+    "Kaoma",
+    "Mungwi",
+    "Kasempa",
+    "Mansa",
+    "Kaputa",
+    "Nyimba",
+    "Nyimba",
+    "Chavuma",
+    "Luwingu",
+    "Nchelenge",
+    "Chambeshi",
+    "Zambezi",
+    "Mufumbwe",
+    "Mkushi",
+    "Mungwi",
+    "Choma",
+    "Kabompo",
+    "Serenje",
+    "Nakonde",
+    "Isoka",
+    "Lundazi",
+    "Chasefu",
+    "Kalabo",
+    "Mwinilunga",
+    "Petauke",
+    "Lukulu",
+    "Nampundwe",
+    "Lwanshya",
+    "Mansa",
+    "Chisamba",
+    "Kaoma",
+    "Kawambwa",
+    "Mazabuka",
+    "Mongu",
+    "Mpika",
+    "Mporokoso",
+    "Mpulungu",
+    "Mufumbwe",
+    "Mwinilunga",
+    "Namwala",
+    "Nchelenge",
+    "Ngoma",
+    "Senanga",
+    "Sesheke",
+    "Siavonga",
+    "Sinazongwe",
+    "Chililabombwe",
+    "Chingola",
+    "Chinsali",
+    "Chipata",
+    "Chirundu",
+    "Choma",
+    "Chongwe",
+    "Isoka",
+    "Kabompo",
+    "Kafue",
+    "Kalabo",
+    "Kalomo",
+    "Kalulushi",
+    "Kapiri Mposhi",
+    "Kasama",
+    "Kasempa",
+    "Katete",
+    "Kaumbwe",
+    "Kawambwa",
+    "Kazembe",
+    "Kawambwa",
+    "Kitwe",
+    "Kiwewe",
+    "Kwacha",
+    "Lufwanyama",
+    "Lundazi",
+    "Lusaka",
+    "Macha",
+    "Mansa",
+    "Mazabuka",
+    "Mbala",
+    "Mfuwe",
+    "Mkushi",
+    "Mongu",
+    "Mporokoso",
+    "Mpulungu",
+    "Mufulira",
+    "Mumbwa",
+    "Mwinilunga",
+    "Nakonde",
+    "Namwala",
+    "Nchelenge",
+    "Ngoma",
+    "Pemba",
+    "Petauke",
+    "Samfya",
+    "Senanga",
+    "Seruka",
+    "Sesheke",
+    "Sinazongwe",
+    "Sioma",
+    "Siavonga",
+    "Sikongo",
+    "Sinda",
+    "Siyameja",
+    "Solwezi",
+    "Sulwegesi",
+    "Zambezi"
+];
+
+
+    // Function to populate datalist with cities
+    function populateDatalist(datalistId, cities) {
+        const datalist = document.getElementById(datalistId);
+        datalist.innerHTML = ""; // Clear existing options
+
+        cities.forEach(city => {
+            const option = document.createElement("option");
+            option.value = city;
+            datalist.appendChild(option);
+        });
+    }
+
+    // Populate current location datalist
+    populateDatalist("currentLocationList", zambianCities);
+
+    // Populate destination datalist
+    populateDatalist("destinationList", zambianCities);
+
+
+
+    // Function to update form content and heading
+    function updateFormAndHeading(formContent, headingText, action) {
+        // Update form content
+        $('.search-containers').html(formContent);
+        // Update heading text
+        $('.header strong').text(headingText);
+        // Set form action attribute
+       // $('form').attr('action', action);
+        // Scroll to the form
+       // $('html, body').animate({
+          //  scrollTop: $('.search-containers').offset().top
+      //  }, 500);
+       
+    }
+
+    // Travel button click event
+    $('.choice.travel').click(function() {
+        $(this).addClass('highlighted');
+        $('.choice.courier').removeClass('highlighted'); // Remove highlighted class from courier button
+        // Define travel form HTML
+        var travelForm = `
+        <form method="post" action="{% url 'app:search' %}">
+                {% csrf_token %}
+                <!-- Display form errors -->
+                {% if form_errors_for_travel and not form_errors %}
+                    <!-- Display form errors for the search form -->
+                    <div class="errors">
+                        <ul>
+                            {% for field, errors in form_errors_for_travel.items %}
+                                {% for error in errors %}
+                                    {% if field == 'current_location' %}
+                                        <li class="error-message">Please provide your current location.</li>
+                                    {% elif field == 'destination' %}
+                                        <li class="error-message">Please provide your destination.</li>
+                                    {% elif field == 'date' %}
+                                        <li class="error-message">Please select a date.</li>
+                                    {% else %}
+                                        <li class="error-message">{{ field|title }}: {{ error }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                <!-- Form -->
+                <form method="post" action="{% url 'app:search' %}">
+                    {% csrf_token %}
+                    <div class="search-containers">
+                        <label>From</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-map-marker-alt" style="color: var(--primary-color);"></i>
+                            <input type="text" name="current_location" id="currentLocationInput" list="currentLocationList">
+                        </div><br>
+                        <label>To</label>
+                        <div class="input-with-icon">
+                            <i class="fas fa-flag-checkered" style="color: var(--primary-color);"></i>
+                            <input type="text" name="destination" id="destinationInput" list="destinationList">
+                        </div><br>
+                        <label><i class="far fa-calendar-alt" style="color: var(--primary-color);"></i>Date</label>
+                        <input type="date"  name="date" value="{% now 'Y-m-d' %}" min="{% now 'Y-m-d' %}">
+                        <br>
+                        <button type="submit" id="findBus">Find Bus</button>
+                    </div>
+                    <datalist id="currentLocationList">
+                        <!-- Populate this datalist dynamically with Zambian cities -->
+                    </datalist>
+                    <datalist id="destinationList">
+                        <!-- Populate this datalist dynamically with Zambian cities -->
+                    </datalist>
+                </form>
+        `;
+        // Call updateFormAndHeading function to update form and heading
+        updateFormAndHeading(travelForm, 'Book a trip', '{% url "app:search" %}');
+       
+    });
+
+    // Courier button click event
+    $('.choice.courier').click(function() {
+        $(this).addClass('highlighted');
+        $('.choice.travel').removeClass('highlighted'); // Remove highlighted class from travel button
+        
+        // Define courier form HTML
+        var courierForm = `
+        <form id="courierForm" method="post" action="{% url 'app:courier-search' %}">
+            {% csrf_token %}
+            {% if form_errors_for_dashboard and not form_errors %}
+            <!-- Display form errors for the courier form -->
+            <div class="errors">
+                <ul>
+                    {% for field, errors in form_errors_for_dashboard.items %}
+                        {% for error in errors %}
+                            {% if field == 'current_location' %}
+                                <li>Please provide your current location.</li>
+                            {% elif field == 'destination' %}
+                                <li>Please provide your destination.</li>
+                                <li>{{ field|title }}: {{ error }}</li>
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+            <div class="search-containers">
+                <div id="errorMessages" class="errors"></div> <!-- New error message element -->
+
+                <label for="currentLocationInput">From</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-map-marker-alt" style="color: var(--primary-color);"></i>
+                    <input type="text" name="current_location" id="currentLocationInput">
+                </div>
+                <br>
+                <label for="destinationInput">To</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-flag-checkered" style="color: var(--primary-color);"></i>
+                    <input type="text" name="destination" id="destinationInput">
+                </div>
+                <br>
+                <button id="sendParcelButton" type="submit">Send Parcel</button>
+            </div>
+        </form>
+
+        `;
+        // Call updateFormAndHeading function to update form and heading
+        updateFormAndHeading(courierForm, 'Send a parcel', '{% url "app:courier-search" %}');
+        // Hide error messages for courier form
+        // $('.errors').hide();
+        // Attach event listener for "Send Parcel" button click event
+        $(document).on('click', '#sendParcelButton', function(event) {
+        console.log("Send Parcel button clicked!");
+        
+        var currentLocation = $('#currentLocationInput').val().trim();
+        var destination = $('#destinationInput').val().trim();
+        
+        var formData = {
+            'current_location': currentLocation,
+            'destination': destination,
+            'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val()
+        };
+
+
+        localStorage.setItem('currentLocation', currentLocation);
+        localStorage.setItem('destination', destination);
+
+
+        var errorMessages = $('.errors');
+        if (currentLocation === '' || destination === '') {
+            errorMessages.html('<ul><li>Please fill in all fields.</li></ul>');
+            event.preventDefault();
+            return;
+        }
+
+        console.log('logged 3');
+
+        $.ajax({
+            type: 'POST',
+            url: '/courier-search/',
+            headers: {
+                'X-CSRFToken': $('input[name="csrfmiddlewaretoken"]').val()
+            },
+            data: formData,
+            success: function(response) {
+                window.location.href = '{% url "app:enter-package-details" %}';
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error: " + xhr.status + " " + xhr.statusText);
+                console.error("Response Text: " + xhr.responseText);
+                console.error("Error: " + error);
+                console.log("Error occurred during AJAX request.");
+            }
+
+        });
+    });
+});
+
+
+
+   
+
+
+    // Event listener for place image click
+        $('#placeImg').click(function() {
+            var destination = "Lusaka"; // Set destination to "Lusaka"
+            $('#destinationInput').val(destination); // Update the value of the destination input field
+        });
+
+        $('#placeImgChingola').click(function() {
+            var destination = "Chingola"; // Set destination to "Chingola"
+            $('#destinationInput').val(destination); // Update the value of the destination input field
+        });
+
+        $('#placeImgKabwe').click(function() {
+            var destination = "Kabwe"; // Set destination to "Chingola"
+            $('#destinationInput').val(destination); // Update the value of the destination input field
+        });
+
+        $('#placeImgKitwe').click(function() {
+            var destination = "Kitwe"; // Set destination to "Chingola"
+            $('#destinationInput').val(destination); // Update the value of the destination input field
+        });
+
+        $('#placeImgLivingstone').click(function() {
+            var destination = "Livingstone"; // Set destination to "Chingola"
+            $('#destinationInput').val(destination); // Update the value of the destination input field
+        });
+
+        $('#placeImgNdola').click(function() {
+            var destination = "Ndola"; // Set destination to "Chingola"
+            $('#destinationInput').val(destination); // Update the value of the destination input field
+        });
+});
+
+</script>
+<script>
+    // Ensure this script is placed after the form elements in your HTML
+
+    // The following function will be called when the form is submitted
+    $(document).on('click', '#findBus', function(event) {
+        console.log("printed");
+        // Retrieve values from form fields
+        var currentLocation = document.getElementById('currentLocationInput').value;
+        var destination = document.getElementById('destinationInput').value;
+        var selectedDate = document.getElementById('dateInput').value;
+        console.log(currentLocation)
+        // Store values in localStorage
+        localStorage.setItem('currentLocation', currentLocation);
+        localStorage.setItem('destination', destination);
+        localStorage.setItem('selectedDate', selectedDate);
+    });
+
+    // Function to retrieve and set default values from local storage
+    function setDefaultValues() {
+        // Retrieve values from localStorage
+        var currentLocation = localStorage.getItem('currentLocation');
+        var destination = localStorage.getItem('destination');
+
+        // Set default values for current location and destination inputs
+        document.getElementById('currentLocationInput').value = currentLocation || '';
+        document.getElementById('destinationInput').value = destination || '';
+    }
+
+    // Call the function to set default values when the page is loaded
+    document.addEventListener('DOMContentLoaded', setDefaultValues);
+</script>
+  
+</body>
+</html>
+{% endblock %}

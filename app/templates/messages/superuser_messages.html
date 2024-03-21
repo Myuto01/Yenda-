@@ -1,0 +1,40 @@
+<h1>Your Messages</h1>
+<ul>
+    {% for message in messages %}
+    <li>
+        {% if message.sender == request.user %}
+        <strong>You:</strong>
+        {% else %}
+        <strong>{{ message.sender }}</strong>
+        {% endif %}
+        {{ message.content }} ({{ message.timestamp }})
+    </li>
+    {% endfor %}
+</ul>
+
+<h1>Send Message</h1>
+<form method="post">
+    {% csrf_token %}
+    <textarea name="content"></textarea>
+    <button type="submit">Send</button>
+</form>
+
+<h1>Received Messages</h1>
+<ul>
+    {% for message in messages %}
+    <li>
+        <strong>{{ message.sender }}</strong>
+        {{ message.content }} ({{ message.timestamp }})
+        {% if not message.read %}
+        <a href="{% url 'mark_read' message.id %}">Mark as Read</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+</ul>
+
+
+
+
+<!--Dashboard--> 
+
+<a href="{% url 'app:customer_service_message' sender_id=superuser_id %}" class="text-reset">Customer Service</a>
