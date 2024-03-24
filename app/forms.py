@@ -3,6 +3,7 @@ from .models import User
 from django.contrib.auth.forms import UserCreationForm
 from reservation_system.models import BuyerDetails, PackageDetails, Suggestion
 from django.forms import formset_factory
+
 #User Forms
 class CreateUserForm(UserCreationForm):
     class Meta:
@@ -15,17 +16,6 @@ class CreateUserForm(UserCreationForm):
             "password1",
             "password2",
         ]
-
-    def __init__(self, *args, **kwargs):
-        super(CreateUserForm, self).__init__(*args, **kwargs)
-
-        # Adding placeholders for each form field
-        self.fields['first_name'].widget.attrs['placeholder'] = 'Enter your First Name'
-        self.fields['last_name'].widget.attrs['placeholder'] = 'Enter your Last Name'
-        self.fields['username'].widget.attrs['placeholder'] = 'Enter your username'
-        self.fields['email'].widget.attrs['placeholder'] = 'Enter your email'
-        self.fields['password1'].widget.attrs['placeholder'] = 'Enter your password'
-        self.fields['password2'].widget.attrs['placeholder'] = 'Confirm your password'
 
 # Change Name
 class ChangeNameForm(forms.ModelForm):

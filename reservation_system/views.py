@@ -7,58 +7,60 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from .decorators import unauthenticated_user, allowed_users
 from django.contrib.auth.models import Group
+from django.http import JsonResponse
 
+#Django Rest Framework imports
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from json import JSONDecodeError
+from reservation_system.serializers import BusOperatorRegistrationSerializer
+from rest_framework.parsers import JSONParser
+from rest_framework import views, status
+from rest_framework.response import Response
 
 @unauthenticated_user
 def register(request):
-    print("loading")
-    form = CreateUserForm()
-
-    if request.method == 'POST':
-        form = CreateUserForm(request.POST)
-        if form.is_valid():
-            # Save the User instance first
-            user = form.save(commit=False)
-            user.save()
-
-            # Create a ReservationSystemUser instance associated with the newly created user
-            reservation_user = ReservationSystemUser.objects.create(user=user, email=form.cleaned_data.get('email'))
-
-            username = form.cleaned_data.get('username')
-
-            group = Group.objects.get(name='Bus Operator')
-            user.groups.add(group)
-
-            # Log in the user after successful registration
-            login(request, user)
-
-            messages.success(request, f'Welcome, {user.username}! Your account has been successfully created.')
-            return redirect('reservation_system:bus_operator_dashboard')
-        else:
-            # Print form errors to help identify the issue
-            print(form.errors)
-
-    context = {'form': form}
+    context = {}
     return render(request, '../templates/bus_operator_register.html', context)
 
-@unauthenticated_user
-def login_register(request):
-    form = LoginForm(request.POST or None)
+# User Registration serializer
+class BusOperatorRegistrationAPIView(views.APIView):
+    """
+    A simple APIView for creating application users.
+    """
+    serializer_class = BusOperatorRegistrationSerializer
 
-    if request.method == 'POST' and form.is_valid():
-        username = form.cleaned_data['username']
-        password = form.cleaned_data['password']
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
 
-        user = authenticate(request, username=username, password=password)
-        print(username)
-        print(password)
-        if user is not None:
-            login(request, user)
-            return redirect('reservation_system:bus_operator_dashboard')
-        else:
-            messages.info(request, 'Username or Password is incorrect')
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
 
-    return render(request, '../templates/bus_operator_login.html', {'form': form})
+    def post(self, request):
+            data = JSONParser().parse(request)
+            print('Executed')
+            serializer = BusOperatorRegistrationSerializer(data=data)
+            if serializer.is_valid():
+                user = serializer.save()
+                
+                group = Group.objects.get(name='Bus Operator')
+                user.groups.add(group)
+
+                login(request, user)
+                return Response(serializer.data, status=200)
+            else:
+                errors = serializer.errors
+                print('Errors:',serializer.errors)  
+                print('Redirecting')
+                return JsonResponse({'errors': errors}, status=400)  # Return JSON response with status code 400
+        
+
 
 
 

@@ -1,0 +1,138 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yenda| Get The Best Deals On Intercity Bus Travelling</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+    <style>
+        .left {
+            background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.5)),
+                url('{% static "images/bg1.jpg" %}');
+            background-size: cover;
+        }
+
+        .error-message {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="split-screen">
+        <div class="left"> 
+            <section class="copy">
+                <h1 class="dynamic-txts">
+                    <ul>
+                        <li><span>Welcome to Yenda</span></li>
+                        <li><span>Tuleishani ku Yenda</span></li>
+                        <li><span>Kulibonesha ku Yenda</span></li>
+                        <li><span>Buloka ku Yenda</span></li>
+                    </ul>
+                </h1>
+                <p>Book Your Ticket Next </p>
+            </section>
+        </div>
+       <div class="right">
+        <form method="post" id="signup-form" action=" ">
+            {% csrf_token %}
+            <section class="copy">
+                <h2>Sign Up</h2>
+                <div class="login-container">
+                    <p>Sign up as <a href="{% url 'reservation_system:register-bus' %}"><strong>Bus Operator</strong></a></p>
+                    <p>Already have an account? <a href="{% url 'app:login' %}"><strong>Log In</strong></a></p>
+                </div>
+            </section>
+            <div class="input-container name">
+                <label for="id_first_name">First Name</label>
+                <input id="id_first_name" name="first_name" type="text">
+                <span class="error-message" id="error-first_name"></span> <!-- Placeholder for error message -->
+            </div>
+            <div class="input-container name">
+                <label for="id_last_name">Last Name</label>
+                <input id="id_last_name" name="last_name" type="text">
+                <span class="error-message" id="error-last_name"></span> <!-- Placeholder for error message -->
+            </div>
+            <div class="input-container username">
+                <label for="id_username">Username</label>
+                <input id="id_username" name="username" type="text">
+                <span class="error-message" id="error-username"></span> <!-- Placeholder for error message -->
+            </div>
+            <div class="input-container email">
+                <label for="id_email">E-mail</label>
+                <input id="id_email" name="email" type="email">
+                <span class="error-message" id="error-email"></span> <!-- Placeholder for error message -->
+            </div>
+            <div class="input-container password">
+                <label for="id_password">Enter Password</label>
+                <input id="id_password" name="password" type="password">
+                <span class="error-message" id="error-password"></span> <!-- Placeholder for error message -->
+            </div>
+            <div class="input-container password">
+                <label for="id_password2">Confirm Password</label>
+                <input id="id_password2" name="password2" type="password">
+                <span class="error-message" id="error-password2"></span> <!-- Placeholder for error message -->
+                <i class="far fa-eye-slash"></i>
+            </div>
+            <div class="input-container cta">
+                <label class="checkbox-container">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                    Sign up for email updates.
+                </label>
+            </div>
+            <button class="signup-btn" type="submit">Sign Up</button>
+            <section class="copy legal">
+                <p><span class="small">By continuing, you agree to accept our <br> <a href="#">Privacy Policy</a> &amp; <a href="#">Terms of service</a></span></p>
+            </section>
+        </form>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#signup-form").submit(function(e) {
+                e.preventDefault(); // Prevent default form submission
+    
+                // Get form data
+                const formData = {
+                    first_name: $("#id_first_name").val(),
+                    last_name: $("#id_last_name").val(),
+                    username: $("#id_username").val(),
+                    email: $("#id_email").val(),
+                    password: $("#id_password").val(),
+                    password2: $("#id_password2").val(),
+                };
+    
+                // Send AJAX request
+                $.ajax({
+                    url: "{% url 'app:user_registration' %}",
+                    type: "POST",
+                    contentType: "application/json", // Set content type to JSON
+                    data: JSON.stringify(formData), // Convert data to JSON string
+                    success: function(response) {
+                        console.log("Success:", response);
+                        window.location.href = "{% url 'app:dashboard' %}"; // Redirect to dashboard
+                    },
+                    error: function(xhr, status, error) {
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        var errors = jsonResponse.errors;
+                        
+                        // Clear previous error messages
+                        $(".error-message").text('');
+    
+                        // Display errors next to the corresponding fields
+                        for (var field in errors) {
+                            if (errors.hasOwnProperty(field)) {
+                                var errorMessage = errors[field][0];
+                                $("#error-" + field).text(errorMessage);
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

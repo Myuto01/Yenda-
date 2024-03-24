@@ -7,7 +7,6 @@ import qrcode
 from io import BytesIO
 from django.core.files.base import ContentFile
 
-#print('dir:', dir(qrcode))
 
 class ReservationSystemUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='reservationsystemuser')
@@ -15,6 +14,9 @@ class ReservationSystemUser(models.Model):
     total_seats = models.IntegerField(default=0)
     rows = models.IntegerField(default=0)
     columns = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.user}'
 
 class TripSchedule(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, null=False)
@@ -27,7 +29,9 @@ class TripSchedule(models.Model):
     estimated_arrival_time = models.TimeField(default=timezone.now)
     price = models.DecimalField(max_digits=8, decimal_places=2)
     bookmarked = models.BooleanField(default=False)
-  
+    
+    def __str__(self):
+            return f'{self.bus_operator}'
 
 class BuyerDetails(models.Model):
     buyer = models.ForeignKey(User, on_delete=models.CASCADE)

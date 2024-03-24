@@ -13,6 +13,10 @@
                 url('{% static "images/bg1.jpg" %}');
             background-size: cover;
         }
+        
+        .error-message {
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -31,31 +35,36 @@
             </section>
         </div>
        <div class="right">
-        <form method="post" action="{% url 'reservation_system:register-bus' %}">
+        <form method="post" id="busoperatorsignup-form" action="">
             {% csrf_token %}
             {{form.errors}}
             <section class="copy">
                 <h2>Sign Up</h2>
                 <div class="login-container">
                     <p>Sign up as <a href="{% url 'app:register-user' %}"><strong>Traveller</strong></a></p>
-                    <p>Already have an account? <a href="{% url 'reservation_system:bus-operator-login' %}"><strong>Log In</strong></a></p>
+                    <p>Already have an account? <a href="{% url 'app:login' %}"><strong>Log In</strong></a></p>
                 </div>
             </section>
             <div class="input-container username">
                 <label for="id_username">Bus Operator Name</label>
                 <input id="id_username" name="username" type="text" placeholder=" Use a hyphen (-) for spacing ">
+                <span class="error-message" id="error-username"></span> <!-- Placeholder for error message -->
+
             </div>
             <div class="input-container email">
                 <label for="id_email">E-mail</label>
                 <input id="id_email" name="email" type="email" placeholder="Enter Your Email">
+                <span class="error-message" id="error-email"></span> <!-- Placeholder for error message -->
             </div>
             <div class="input-container password">
-                <label for="id_password1">Enter Password</label>
-                <input id="id_password1" name="password1" type="password" placeholder="Enter Password">
+                <label for="id_password">Enter Password</label>
+                <input id="id_password" name="password" type="password" placeholder="Enter Password">
+                <span class="error-message" id="error-password"></span> <!-- Placeholder for error message -->
             </div>
             <div class="input-container password">
                 <label for="id_password2">Confirm Password</label>
                 <input id="id_password2" name="password2" type="password" placeholder="Confirm Password">
+                <span class="error-message" id="error-password2"></span> <!-- Placeholder for error message -->
                 <i class="far fa-eye-slash"></i>
             </div>
             <div class="input-container cta">
@@ -72,5 +81,48 @@
         </form>
         </div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#busoperatorsignup-form").submit(function(e) {
+                e.preventDefault(); // Prevent default form submission
+    
+                // Get form data
+                const formData = {
+                    username: $("#id_username").val(),
+                    email: $("#id_email").val(),
+                    password: $("#id_password").val(),
+                    password2: $("#id_password2").val(),
+                };
+    
+                // Send AJAX request
+                $.ajax({
+                    url: "{% url 'reservation_system:bus_operator_registration' %}",
+                    type: "POST",
+                    contentType: "application/json", // Set content type to JSON
+                    data: JSON.stringify(formData), // Convert data to JSON string
+                    success: function(response) {
+                        console.log("Success:", response);
+                        window.location.href = "{% url 'reservation_system:bus_operator_dashboard' %}"; // Redirect to dashboard
+                    },
+                    error: function(xhr, status, error) {
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        var errors = jsonResponse.errors;
+                        
+                        // Clear previous error messages
+                        $(".error-message").text('');
+    
+                        // Display errors next to the corresponding fields
+                        for (var field in errors) {
+                            if (errors.hasOwnProperty(field)) {
+                                var errorMessage = errors[field][0];
+                                $("#error-" + field).text(errorMessage);
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

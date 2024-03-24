@@ -81,6 +81,10 @@ urlpatterns = [
       template_name="registration/password_reset_complete.html"
     ), name="password_reset_complete"),
 
+
+# DRF URLS
+   path('registration/', views.RegistrationAPIView.as_view(), name='user_registration'),
+
 ]  
 
 # Add the following line to serve media files during development

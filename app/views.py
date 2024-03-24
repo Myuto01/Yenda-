@@ -36,32 +36,60 @@ from django.utils import timezone
 from datetime import datetime
 import uuid
 
+
+#Django Rest Framework imports
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import UserRegistrationSerializer
+from json import JSONDecodeError
+from .serializers import UserRegistrationSerializer
+from rest_framework.parsers import JSONParser
+from rest_framework import views, status
+from rest_framework.response import Response
+
 @unauthenticated_user
 def register_user(request):
-    print("loading")
-    form = CreateUserForm()
+    return render(request, '../templates/registration/regitser.html')
 
-    if request.method == 'POST':
-        form = CreateUserForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            username = form.cleaned_data.get('username')
+# User Registration serializer
+class RegistrationAPIView(views.APIView):
+    """
+    A simple APIView for creating application users.
+    """
+    serializer_class = UserRegistrationSerializer
 
-            group = Group.objects.get(name='User')
-            user.groups.add(group)
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
 
-            # Log in the user after successful registration
-            login(request, user)
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
 
-            messages.success(request, f'Welcome, {request.user.first_name}! Your account has been successfully created.')
-            return redirect('app:dashboard')
-        else:
-            # Print form errors to help identify the issue
-            print(form.errors)
+    def post(self, request):
+            data = JSONParser().parse(request)
+            print('Executed')
+            serializer = UserRegistrationSerializer(data=data)
+            if serializer.is_valid():
+                user = serializer.save()
+            
+                # Add the user to the 'User' group
+                group = Group.objects.get(name='User')
+                user.groups.add(group)
 
-    context = {'form': form}
-    return render(request, '../templates/regitser.html', context)
-
+                # Log in the user
+                login(request, user)
+                return Response(serializer.data, status=200)
+            else:
+                errors = serializer.errors
+                print('Errors:',serializer.errors)  
+                print('Redirecting')
+                return JsonResponse({'errors': errors}, status=400)  # Return JSON response with status code 400
+        
 @unauthenticated_user
 def login_register(request):
     form = LoginForm(request.POST or None)
