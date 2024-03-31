@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect,reverse, get_object_or_404
-from .forms import CreateUserForm, LoginForm, SearchForm, BuyerDetailsForm, SelectTicketsForm, CourierSearchForm, PackageDetailsForm, ChangeNameForm, ChangeProfilePic, SuggestionForm
+from .forms import  SearchForm, BuyerDetailsForm, SelectTicketsForm, CourierSearchForm, PackageDetailsForm, ChangeNameForm, ChangeProfilePic, SuggestionForm
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -38,12 +38,13 @@ import uuid
 
 
 #Django Rest Framework imports
+from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import UserRegistrationSerializer
 from json import JSONDecodeError
-from .serializers import UserRegistrationSerializer
+from app.serializers import UserRegistrationSerializer, TicketSerializer
 from rest_framework.parsers import JSONParser
 from rest_framework import views, status
 from rest_framework.response import Response
@@ -52,71 +53,10 @@ from rest_framework.response import Response
 def register_user(request):
     return render(request, '../templates/registration/regitser.html')
 
-# User Registration serializer
-class RegistrationAPIView(views.APIView):
-    """
-    A simple APIView for creating application users.
-    """
-    serializer_class = UserRegistrationSerializer
 
-    def get_serializer_context(self):
-        return {
-            'request': self.request,
-            'format': self.format_kwarg,
-            'view': self
-        }
-
-    def get_serializer(self, *args, **kwargs):
-        kwargs['context'] = self.get_serializer_context()
-        return self.serializer_class(*args, **kwargs)
-
-    def post(self, request):
-            data = JSONParser().parse(request)
-            print('Executed')
-            serializer = UserRegistrationSerializer(data=data)
-            if serializer.is_valid():
-                user = serializer.save()
-            
-                # Add the user to the 'User' group
-                group = Group.objects.get(name='User')
-                user.groups.add(group)
-
-                # Log in the user
-                login(request, user)
-                return Response(serializer.data, status=200)
-            else:
-                errors = serializer.errors
-                print('Errors:',serializer.errors)  
-                print('Redirecting')
-                return JsonResponse({'errors': errors}, status=400)  # Return JSON response with status code 400
-        
 @unauthenticated_user
 def login_register(request):
-    form = LoginForm(request.POST or None)
-
-    if request.method == 'POST' and form.is_valid():
-        username = form.cleaned_data['username']
-        password = form.cleaned_data['password']
-
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
-            login(request, user)
-
-            # Determine user type and redirect accordingly
-            if user.groups.filter(name='User').exists():
-                return redirect('app:dashboard')  # Redirect to user dashboard
-            elif user.groups.filter(name='Bus Operator').exists():
-                return redirect('reservation_system:bus_operator_dashboard')  # Redirect to bus operator dashboard
-            else:
-                # Handle other user types or invalid group membership
-                messages.error(request, 'Invalid user type or group membership.')
-                return render(request, '../templates/login.html', {'form': form})  # Render login page with error message
-
-        else:
-            messages.info(request, 'Username or Password is incorrect')
-
-    return render(request, '../templates/login.html', {'form': form})
+    return render(request, '../templates/login.html')
 
 @login_required(login_url='app:login')
 def logoutUser(request):
@@ -124,7 +64,6 @@ def logoutUser(request):
       return redirect('app:login')
 
 @login_required(login_url='app:login')
-@allowed_users(allowed_roles=['User'])
 def dashboard(request):
 
     form_errors = request.session.pop('form_errors', None)
@@ -155,7 +94,6 @@ def popular_places(request):
 
 
 @login_required(login_url='app:login')
-@allowed_users(allowed_roles=['User'])
 def search(request):
     if request.method == 'POST':
         form = SearchForm(request.POST)
@@ -253,12 +191,13 @@ def select_tickets(request, trip_id):  # Adjust parameter name to trip_id
             # Save the selected number of tickets in the session or form data
             selected_number_of_tickets = form.cleaned_data['number_of_tickets']
             request.session['selected_number_of_tickets'] = selected_number_of_tickets  # Store in session
-            return redirect('app:enter_passenger_details', trip_id=trip_id)  # Use trip_id
+            return redirect('app:enter-passenger-details', trip_id=trip_id)  # Use trip_id
     else:
         form = SelectTicketsForm()
 
     context = {'trip': trip, 'form': form}
     return render(request, 'select_tickets.html', context)
+
 
 @login_required(login_url='app:login')
 @allowed_users(allowed_roles=['User'])
@@ -266,44 +205,62 @@ def enter_passenger_details(request, trip_id):
     trip = get_object_or_404(TripSchedule, id=trip_id)
     selected_number_of_tickets = request.session.get('selected_number_of_tickets', 1)
     BuyerDetailsFormSet = inlineformset_factory(User, BuyerDetails, form=BuyerDetailsForm, fields=('name', 'phonenumber'), extra=selected_number_of_tickets, can_delete=True)
-    # Retrieve passenger details from the session
-    passenger_details_session = request.session.get('passenger_details', [])
 
     if request.method == 'POST':
         formset = BuyerDetailsFormSet(request.POST, prefix='passenger')
         if formset.is_valid():
             instances = formset.save(commit=False)
-
-            # Add only unique passenger details to the session
             passenger_details_session = request.session.get('passenger_details', [])
             for instance in instances:
                 new_passenger = {
                     'name': instance.name,
                     'phonenumber': instance.phonenumber,
                 }
-
-                # Check for duplicates before appending
                 if new_passenger not in passenger_details_session:
                     passenger_details_session.append(new_passenger)
 
             request.session['passenger_details'] = passenger_details_session
-
             return redirect('app:ticket_confirmation', trip_id=trip_id)
-
-        else:
-            # Handle formset errors here, e.g., pass them to the context for rendering
-            context['formset_errors'] = formset.errors
-
     else:
         formset = BuyerDetailsFormSet(prefix='passenger')
 
-      # Check if 'passenger_details' key exists in the session
+    # Move context declaration to the beginning
+    context = {'trip': trip, 'formset': formset}
+
+    # Only clear session data if not needed anymore
     if 'passenger_details' in request.session:
-        # Delete the passenger details from the session after viewing
         del request.session['passenger_details']
 
-    context = {'trip': trip, 'formset': formset}
     return render(request, 'enter_passenger_details.html', context)
+
+class TicketConfirmationAPIView(APIView):
+    def post(self, request, trip_id, format=None):
+        trip = get_object_or_404(TripSchedule, id=trip_id)
+        passenger_details_session = request.session.get('passenger_details', [])
+        total_price = trip.price * len(passenger_details_session)
+        
+        phone_number = request.data.get('phone_number')  # Assuming phone_number is sent in the request data
+        
+        if phone_number:
+            reference = generate_ticket_number()
+            payment_success, payment_message = process_payment(phone_number, total_price, reference)
+            
+            if payment_success:
+                # Create tickets
+                create_tickets(request, trip, passenger_details_session, reference)
+                send_confirmation_email(request, trip, passenger_details_session)
+                
+                # Clear session
+                del request.session['passenger_details']
+                
+                # Return success response
+                return Response({"message": "Ticket successfully booked! Check your email for confirmation."}, status=status.HTTP_201_CREATED)
+            else:
+                # Return error response for payment failure
+                return Response({"error": payment_message}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # Return error response for missing phone number
+            return Response({"error": "Invalid phone number. Please enter a valid phone number."}, status=status.HTTP_400_BAD_REQUEST)
 
 @login_required(login_url='app:login')
 @allowed_users(allowed_roles=['User'])
@@ -315,7 +272,7 @@ def ticket_confirmation(request, trip_id):
     if request.method == 'POST':
         # Get phone number from request.POST
         phone_number = request.POST.get('modal_phone_number')
-
+        print(phone_number)
         # Check if phone number exists
         if phone_number:
             reference = generate_ticket_number()

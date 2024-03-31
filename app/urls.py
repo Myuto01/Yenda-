@@ -83,7 +83,7 @@ urlpatterns = [
 
 
 # DRF URLS
-   path('registration/', views.RegistrationAPIView.as_view(), name='user_registration'),
+   path('ticket-confirmation/<uuid:trip_id>', views.TicketConfirmationAPIView.as_view(), name='ticket-confirmation'),
 
 ]  
 
@@ -113,7 +113,3 @@ if settings.DEBUG:
 
 
 
- # Add other URL patterns as needed
-    #path('seat_selection/<int:trip_schedule_id>/', views.seat_selection, name='seat_selection'),
-    #path('confirm_reservation/<int:trip_schedule_id>/', views.confirm_reservation, name='confirm_reservation'),
-    #path('seat-arrangement/<int:trip_schedule_id>/', views.seat_arrangement, name='seat_arrangement'),

@@ -13,3 +13,5 @@ class User(AbstractUser):
     # Provide unique related names to avoid clashes
     groups = models.ManyToManyField(Group, related_name='custom_user_groups')
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_permissions')
+
+    

@@ -14,7 +14,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from json import JSONDecodeError
-from reservation_system.serializers import BusOperatorRegistrationSerializer
+from reservation_system.serializers import BusOperatorRegistrationSerializer,TripScheduleSerializer
 from rest_framework.parsers import JSONParser
 from rest_framework import views, status
 from rest_framework.response import Response
@@ -69,6 +69,49 @@ def bus_operator_dashboard(request):
     context = {'user': request.user}
     return render(request, '../templates/bus_operator_dashboard.html', context)
 
+# User Registration serializer
+class TripScheduleAPIView(views.APIView):
+    """
+    A simple APIView for creating application users.
+    """
+    serializer_class = TripScheduleSerializer
+
+    def get_serializer_context(self):
+        return {
+            'request': self.request,
+            'format': self.format_kwarg,
+            'view': self
+        }
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['context'] = self.get_serializer_context()
+        return self.serializer_class(*args, **kwargs)
+
+    def post(self, request):
+        data = JSONParser().parse(request)
+        print('Executed')
+        serializer = TripScheduleSerializer(data=data)
+        if serializer.is_valid():
+            # Get the bus operator
+            bus_operator = get_object_or_404(User, id=request.user.id)
+            # Set the bus operator for the instance
+            serializer.validated_data['bus_operator'] = bus_operator
+            
+            # Calculate the new price
+            price = serializer.validated_data['price']
+            new_price = price * decimal.Decimal('1.05')
+            # Assign the increased price back to the serializer
+            serializer.validated_data['price'] = new_price
+            
+            # Save the serializer instance
+            trip_schedule = serializer.save()
+            
+            return Response(serializer.data, status=200)
+        else:
+            errors = serializer.errors
+            print('Errors:',serializer.errors)  
+            print('Redirecting')
+            return JsonResponse({'errors': errors}, status=400)  # Return JSON response with status code 400
 
 @allowed_users(allowed_roles=['Bus Operator'])
 def detail_entry(request):

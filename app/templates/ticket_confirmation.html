@@ -202,21 +202,28 @@
     
         // Get confirm button click event
         confirmButton.addEventListener('click', function() {
-            // Submit modal form data asynchronously
-            fetch(document.getElementById('phone-number-form').action, {
+            // Extract phone number from the form
+            const phoneNumber = document.getElementById('modal-phone-number').value;
+            // Prepare phone number data to be sent as JSON
+            const phoneNumberData = {
+                'phone_number': phoneNumber
+            }
+            // Submit phone number data asynchronously as JSON
+            fetch('{% url 'app:ticket-confirmation' trip.id %}' + tripId + '/', {
                 method: 'POST',
-                body: new FormData(document.getElementById('phone-number-form')),
                 headers: {
+                    'Content-Type': 'application/json',
                     'X-CSRFToken': getCookie('csrftoken') // Include CSRF token in headers
-                }
+                },
+                body: JSON.stringify(phoneNumberData)
             })
             .then(response => {
                 if (response.ok) {
-                    // If modal form submission is successful, submit the first form
-                    document.getElementById('ticketForm').submit();
+                    // Redirect to success page after successfully submitting phone number
+                    window.location.href = '{% url 'app:ticket_success' trip.id %}';
                 } else {
-                    console.error('Modal form submission failed');
-                    // Handle modal form submission failure
+                    console.error('Failed to submit phone number:', response.statusText);
+                    // Handle error response after submitting phone number
                 }
             })
             .catch(error => {

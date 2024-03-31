@@ -32,7 +32,6 @@ INSTALLED_APPS = [
     'reservation_system',
     'rest_framework',
     'rest_framework.authtoken', #Used to enable token authentication
-    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

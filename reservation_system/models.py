@@ -8,6 +8,7 @@ from io import BytesIO
 from django.core.files.base import ContentFile
 
 
+
 class ReservationSystemUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='reservationsystemuser')
     email = models.EmailField(null=False, default="")

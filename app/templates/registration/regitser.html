@@ -35,7 +35,7 @@
             </section>
         </div>
        <div class="right">
-        <form method="post" id="signup-form" action=" ">
+        <form method="post" id="signup-form" action="">
             {% csrf_token %}
             <section class="copy">
                 <h2>Sign Up</h2>
@@ -93,9 +93,10 @@
     <script>
         $(document).ready(function() {
             $("#signup-form").submit(function(e) {
+                console.log("Submitted")
                 e.preventDefault(); // Prevent default form submission
     
-                // Get form data
+                // Get form data 
                 const formData = {
                     first_name: $("#id_first_name").val(),
                     last_name: $("#id_last_name").val(),
@@ -104,10 +105,13 @@
                     password: $("#id_password").val(),
                     password2: $("#id_password2").val(),
                 };
-    
+
+                // Print JSONified data
+                console.log("JSONified Data:", JSON.stringify(formData));
+
                 // Send AJAX request
                 $.ajax({
-                    url: "{% url 'app:user_registration' %}",
+                    url: "https://yenda-user-api.onrender.com/user_registeration/",
                     type: "POST",
                     contentType: "application/json", // Set content type to JSON
                     data: JSON.stringify(formData), // Convert data to JSON string
@@ -115,6 +119,7 @@
                         console.log("Success:", response);
                         window.location.href = "{% url 'app:dashboard' %}"; // Redirect to dashboard
                     },
+                    
                     error: function(xhr, status, error) {
                         var jsonResponse = JSON.parse(xhr.responseText);
                         var errors = jsonResponse.errors;

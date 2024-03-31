@@ -1,6 +1,7 @@
 # serializers.py
 from rest_framework import serializers
-from . models import User
+from .models import User
+from reservation_system.models import BuyerDetails, Ticket
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.validators import UniqueValidator
 
@@ -44,6 +45,23 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         account.save()
         return account
  
+
+
+
+class TicketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = [
+            'id', 
+            'buyer', 
+            'trip',
+            'passenger_name', 
+            'passenger_phonenumber',
+            'ticket_no',
+            'confirmed', 
+            'active'
+        ]
+
 
   
 

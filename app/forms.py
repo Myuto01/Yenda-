@@ -4,18 +4,8 @@ from django.contrib.auth.forms import UserCreationForm
 from reservation_system.models import BuyerDetails, PackageDetails, Suggestion
 from django.forms import formset_factory
 
-#User Forms
-class CreateUserForm(UserCreationForm):
-    class Meta:
-        model = User
-        fields = [
-            "first_name",
-            "last_name",
-            "username",
-            "email",
-            "password1",
-            "password2",
-        ]
+
+
 
 # Change Name
 class ChangeNameForm(forms.ModelForm):
@@ -30,10 +20,8 @@ class ChangeProfilePic(forms.ModelForm):
         model = User
         fields = ['profile_pic']
 
-#Login Form
-class LoginForm(forms.Form):
-    username = forms.CharField()
-    password = forms.CharField(widget=forms.PasswordInput)
+
+
 
 class SearchForm(forms.Form):
     current_location = forms.CharField(label='From', max_length=100, error_messages={'required': 'Please provide your current location.'})

@@ -36,10 +36,10 @@
             </section>
         </div>
         <div class="right">
-            <form method="post" action="{% url 'app:login' %}">
+            <form method="post"  id="login_form" action="">
                 {% csrf_token %}
                 <section class="copy">
-                    <h2>Login</h2>
+                    <h2>Login in</h2>
                     <div class="login-container">
                         <p>Don't have an account? <a href="{% url 'app:register-user' %}"><strong>Sign Up</strong></a></p>
                     </div>
@@ -62,5 +62,47 @@
             </form>
         </div>
     </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#loginForm").submit(function(e) {
+                e.preventDefault(); // Prevent default form submission
+                
+                // Get CSRF token
+                const csrfToken = "{{ csrf_token }}";
+                
+                // Get form data
+                const formData = {
+                    username: $("#username").val(),
+                    password: $("#password").val(),
+                    csrfmiddlewaretoken: csrfToken // Include CSRF token
+                };
+
+                // Send AJAX request
+                $.ajax({
+                    url: "https://yenda-user-api.onrender.com/user_login/",
+                    type: "POST",
+                    contentType: "application/json", // Set content type to JSON
+                    headers: {
+                        "X-CSRFToken": csrfToken // Set CSRF token in headers
+                    },
+                    data: JSON.stringify(formData), // Convert data to JSON string
+                    success: function(response) {
+                        console.log("Success:", response);
+                        console.log("Redirecting to dashboard...");
+                        // Redirect to dashboard URL after successful login
+                        window.location.href = "{% url 'app:dashboard' %}"; // Redirect to dashboard
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error:", error);
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        var errors = jsonResponse.errors;
+                        // Handle errors (if needed)
+                    }
+                });
+            });
+        });
+    </script>
+
 </body>
 </html>

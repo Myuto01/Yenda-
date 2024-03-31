@@ -7,16 +7,97 @@
     <title>Yenda| Bus Entry</title>
 </head>
 <body>
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            {{ message }}
-        </div>
-    {% endfor %}
+
     <h1>Enter Details</h1>
-    <form method="post" action="{% url 'reservation_system:detail-entry' %}">
+
+    <form method="post" id="signup-form" action=" ">
         {% csrf_token %}
-        {{ form.as_p }}
+        <div class="input-container name">
+            <label for="id_driver">Driver Name</label><br>
+            <input id="id_driver" name="driver" type="text">
+            <span class="error-message" id="error-driver"></span> <!-- Placeholder for error message -->
+        </div>
+        <div class="input-container name">
+            <label for="id_origin">Origin</label><br>
+            <input id="id_origin" name="origin" type="text">
+            <span class="error-message" id="error-origin"></span> <!-- Placeholder for error message -->
+        </div>
+        <div class="input-container username">
+            <label for="id_destination">Destination</label><br>
+            <input id="id_destination" name="destination" type="text">
+            <span class="error-message" id="error-destination"></span> <!-- Placeholder for error message -->
+        </div>
+        <div class="input-container email">
+            <label for="id_departure_date">Departure Date</label><br>
+            <input id="id_departure_date" name="departure_date" type="date">
+            <span class="error-message" id="error-departure_date"></span> <!-- Placeholder for error message -->
+        </div>
+        <div class="input-container password">
+            <label for="id_departure_time">Departure Time</label><br>
+                <input id="id_departure_time" name="departure_time" type="time">
+            <span class="error-message" id="error-departure_time"></span> <!-- Placeholder for error message -->
+        </div>
+        <div class="input-container password">
+            <label for="id_estimated_arrival_time">Estimated Arrival Time</label><br>
+            <input id="id_estimated_arrival_time" name="estimated_arrival_time" type="time">
+            <span class="error-message" id="error-estimated_arrival_time"></span> <!-- Placeholder for error message -->
+        </div>
+        <div class="input-container pr">
+            <label for="id_price">Price</label><br>
+            <input id="id_price" name="price" type="number">
+            <span class="error-message" id="error-price"></span> <!-- Placeholder for error message -->
+        </div>
         <button type="submit">Submit</button>
     </form>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#signup-form").submit(function(e) {
+                e.preventDefault(); // Prevent default form submission
+    
+                // Get form data
+                const formData = {
+                    driver: $("#id_driver").val(),
+                    origin: $("#id_origin").val(),
+                    destination: $("#id_destination").val(),
+                    departure_date: $("#id_departure_date").val(),
+                    departure_time: $("#id_departure_time").val(),
+                    estimated_arrival_time: $("#id_estimated_arrival_time").val(),
+                    price: $("#id_price").val(),
+
+                };
+    
+                // Send AJAX request
+                $.ajax({
+                    url: "{% url 'reservation_system:trip_detail_entry' %}",
+                    type: "POST",
+                    contentType: "application/json", // Set content type to JSON
+                    data: JSON.stringify(formData), // Convert data to JSON string
+                    success: function(response) {
+                        console.log("Success:", response);
+                        window.location.href = "{% url 'reservation_system:detail_entry' %}"; // Redirect to dashboard
+                    },
+                    error: function(xhr, status, error) {
+                        var jsonResponse = JSON.parse(xhr.responseText);
+                        var errors = jsonResponse.errors;
+                        
+                        // Clear previous error messages
+                        $(".error-message").text('');
+    
+                        // Display errors next to the corresponding fields
+                        for (var field in errors) {
+                            if (errors.hasOwnProperty(field)) {
+                                var errorMessage = errors[field][0];
+                                $("#error-" + field).text(errorMessage);
+                            }
+                        }
+                    }
+                });
+            });
+            
+
+        });
+    </script>
+    
 </body>
 </html>
